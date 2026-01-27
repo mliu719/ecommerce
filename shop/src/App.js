@@ -55,7 +55,7 @@ function App() {
     setUser({ email: found.email, role: found.role });
   }
   function signOut() {
-    setUser(null)
+    setUser(null);
   }
 
   return (
@@ -67,7 +67,7 @@ function App() {
 
       <Route path="/shop" element={
         <RequireAuth user={user}>
-          <ShopPage user={user} onSignOut={() => setUser(null)} />
+          <ShopPage user={user} onSignOut={signOut} />
         </RequireAuth>}
       />
       <Route path="*" element={<Navigate to="/shop" replace />} />

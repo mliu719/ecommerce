@@ -4,7 +4,7 @@ import CustomerView from '../components/CustomerView';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
 
-export default function ShopPage() {
+export default function ShopPage({ user, onSignOut }) {
 
     const [products, setProducts] = useState([
         { id: 1, name: 'Laptop', price: 999, stock: 5, description: 'Work machine', category: 'Electronics', imageUrl: '' },
@@ -86,6 +86,8 @@ export default function ShopPage() {
     return (
         <div style={{ padding: 20 }}>
             <Header role={role} setRole={setRole}
+                user={user}
+                onSignOut={onSignOut}
                 searchInput={searchInput}
                 setSearchInput={setSearchInput}
                 onSearch={handleSearchClick}

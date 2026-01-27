@@ -19,7 +19,7 @@ function SignInPage({ onSignIn }) {
 
     return (
         <div style={{ maxWidth: 420, margin: "40px auto", padding: 12 }}>
-            <h2>Sign in</h2>
+            <h2>Please Sign in First</h2>
             {err ? <div style={{ color: "crimson" }}>{err}</div> : null}
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>

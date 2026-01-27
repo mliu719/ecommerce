@@ -1,5 +1,15 @@
-function Header({ role, setRole, searchInput, setSearchInput, onSearch, onClear }) {
+import { useNavigate } from "react-router-dom";
+
+function Header({ user, role, setRole, searchInput, setSearchInput, onSearch, onClear, onSignOut }) {
+    const nav = useNavigate();
+    function handleSignOut() {
+        onSignOut();
+        nav("/signin", { replace: true }); // redirect
+    }
+    console.log("Header onSignOut:", onSignOut);
+
     return (
+
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
             <h1 style={{ margin: 0 }}>Shop</h1>
             <input
@@ -14,9 +24,13 @@ function Header({ role, setRole, searchInput, setSearchInput, onSearch, onClear 
             />
             <button onClick={onSearch}>Search</button>
             <button onClick={onClear}>Clear</button>
-
-
-            <span style={{ marginLeft: 8 }}>Role:</span>
+            {user ? (
+                <>
+                    <span>{user.email}</span>
+                    <button onClick={handleSignOut}>Sign Out</button>
+                </>
+            ) : null}
+            <span >Role:</span>
             <button onClick={() => setRole('customer')} disabled={role === 'customer'}>Customer</button>
             <button onClick={() => setRole('owner')} disabled={role === 'owner'}>Owner</button>
         </div>
