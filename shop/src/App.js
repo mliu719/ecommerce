@@ -34,6 +34,10 @@ function App() {
     if (!user) return <Navigate to="/signin" replace />;
     return children;
   }
+  function RequireGuest({ user, children }) {
+    if (user) return <Navigate to="/shop" replace />;
+    return children;
+  }
 
   function signUp({ email, password, role }) {
     const exists = users.some(u => u.email === email);
@@ -62,8 +66,16 @@ function App() {
 
     <Routes>
       <Route path="/" element={<Navigate to="/shop" replace />} />
-      <Route path="/signin" element={<SignInPage onSignIn={signIn} />} />
-      <Route path="/signup" element={<SignUpPage onSignUp={signUp} />} />
+
+      <Route path="/signin"
+        element={
+          <RequireGuest user={user} >
+            <SignInPage onSignIn={signIn} />
+          </RequireGuest>
+        } />
+      <Route path="/signup" element={<RequireGuest user={user}> <SignUpPage onSignUp={signUp} /></RequireGuest>
+
+      } />
 
       <Route path="/shop" element={
         <RequireAuth user={user}>
