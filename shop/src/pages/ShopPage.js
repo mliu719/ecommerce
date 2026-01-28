@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
+import Footer from '../components/Footer';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
@@ -196,6 +197,7 @@ export default function ShopPage({ user, onSignOut }) {
                     onDeleteProduct={deleteProduct} />
             )}
 
+            <Footer />
 
         </div>
 
