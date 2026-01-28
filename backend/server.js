@@ -12,6 +12,7 @@ const products = [
     { id: 3, name: 'Mouse', price: 29, stock: 20, description: 'Wireless', category: 'Accessories', imageUrl: '' },
     { id: 4, name: 'Keyboard', price: 89, stock: 15, description: 'Mechanical', category: 'Accessories', imageUrl: '' },
 ];
+const orders = [];
 
 
 app.use(
@@ -108,4 +109,8 @@ app.post("/api/logout", (req, res) => {
 })
 app.get("/api/products", (req, res) => {
     res.json({ products });
+});
+app.get("/api/orders", requireAuth, (req, res) => {
+    const mine = orders.filter(o => o.userId === req.session.userId);
+    res.json({ orders: mine });
 });

@@ -25,6 +25,13 @@ export default function ShopPage({ user, onSignOut }) {
             .then(d => setProducts(d.products || []));
     }, []);
 
+    useEffect(() => {
+        fetch(`${API}/api/orders`, {
+            credentials: "include",
+        })
+            .then(r => r.json())
+            .then(d => setOrders(d.orders || []));
+    }, []);
 
     const filteredProducts = useMemo(() => {
         const q = appliedSearch.trim().toLowerCase();
