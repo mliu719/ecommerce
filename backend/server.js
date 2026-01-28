@@ -20,6 +20,18 @@ function requireAuth(req, res, next) {
     next();
 }
 
+function requireOwner(req, res, next) {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const user = users.find(u => u.id === req.session.userId);
+    if (!user || user.role !== 'owner') {
+        return res.status(403).json({ error: "Owner access required" });
+    }
+    next();
+}
+
 app.use(
     cors({
         origin: process.env.CLIENT_ORIGIN,
@@ -136,7 +148,7 @@ app.post("/api/orders", requireAuth, (req, res) => {
         createdAt: new Date().toISOString(),
     };
 
-    // persist
+    // add to existing order arr
     orders.unshift(order);
 
     // respond
@@ -144,6 +156,50 @@ app.post("/api/orders", requireAuth, (req, res) => {
 });
 //reload after checkout
 app.get("/api/orders", requireAuth, (req, res) => {
-    const mine = orders.filter(o => o.userId === req.session.userId);
+    const mine = orders.filter(o => o.userEmail === req.session.user.email);
     res.json({ orders: mine });
+});
+
+// Owner product management endpoints
+app.post("/api/products", requireOwner, (req, res) => {
+    const { name, description, category, price, stock, imageUrl } = req.body;
+
+    // basic validation
+    if (!name || !name.trim()) {
+        return res.status(400).json({ error: "Product name required" });
+    }
+    if (typeof price !== "number" || price <= 0) {
+        return res.status(400).json({ error: "Invalid price" });
+    }
+    if (typeof stock !== "number" || stock < 0) {
+        return res.status(400).json({ error: "Invalid stock" });
+    }
+
+    const newProduct = {
+        id: Date.now(),
+        name: name.trim(),
+        description: description?.trim() || '',
+        category: category?.trim() || 'Uncategorized',
+        price,
+        stock,
+        imageUrl: imageUrl?.trim() || '',
+    };
+
+    products.unshift(newProduct);
+    res.status(201).json({ ok: true, product: newProduct });
+});
+
+app.delete("/api/products/:id", requireOwner, (req, res) => {
+    const productId = parseInt(req.params.id);
+    if (isNaN(productId)) {
+        return res.status(400).json({ error: "Invalid product ID" });
+    }
+
+    const productIndex = products.findIndex(p => p.id === productId);
+    if (productIndex === -1) {
+        return res.status(404).json({ error: "Product not found" });
+    }
+
+    const deletedProduct = products.splice(productIndex, 1)[0];
+    res.json({ ok: true, product: deletedProduct });
 });

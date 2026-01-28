@@ -10,7 +10,7 @@ export default function ShopPage({ user, onSignOut }) {
     const [products, setProducts] = useState([
     ]);
 
-    const [role, setRole] = useState('customer'); // 'owner' | 'customer'
+    const [role, setRole] = useState(user?.role || 'customer'); // 'owner' | 'customer'
 
     const [cart, setCart] = useState([])// cart item: { id, name, price, quantity }
     const [promoInput, setPromoInput] = useState("");
@@ -24,6 +24,19 @@ export default function ShopPage({ user, onSignOut }) {
     const categories = ['Category1', 'Category2', 'Category3'];
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
+
+    useEffect(() => {
+        // Fetch user info to get role
+        fetch(`${API}/api/me`, {
+            credentials: "include",
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.user) {
+                    setRole(d.user.role);
+                }
+            });
+    }, []);
 
     useEffect(() => {
         fetch(`${API}/api/products`, {
@@ -87,12 +100,37 @@ export default function ShopPage({ user, onSignOut }) {
         else if (code === "SAVE20") setPromo({ code, percent: 20 });
         else setPromo(null);
     }
-    function createProduct(payload) {
-        const newProduct = { id: Date.now(), ...payload };
-        setProducts(prev => [newProduct, ...prev]);
+
+    async function createProduct(payload) {
+        const r = await fetch(`${API}/api/products`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload),
+        });
+
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Failed to create product");
+
+        // Refresh products list
+        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
+        const d2 = await r2.json();
+        setProducts(d2.products || []);
     }
-    function deleteProduct(id) {
-        setProducts(prev => prev.filter(p => p.id !== id));
+
+    async function deleteProduct(id) {
+        const r = await fetch(`${API}/api/products/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Failed to delete product");
+
+        // Refresh products list
+        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
+        const d2 = await r2.json();
+        setProducts(d2.products || []);
     }
 
 
