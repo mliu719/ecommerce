@@ -3,7 +3,7 @@ const session = require("express-session");
 const cors = require("cors");
 const users = []; //{id, email, pswhash, role}
 const app = express();
-
+app.listen(4000, () => console.log("Backend on 4000"));
 app.use(
     cors({
         origin: "http://localhost:3000",
@@ -54,6 +54,23 @@ app.post("/api/signup", async (req, res) => {
     users.push(user);
     res.status(201).json({ ok: true });
 });
+app.post("/api/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = users.find(u => u.email === email);
+    if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const ok = await require("bcrypt").compare(password, user.passwordHash);
+    if (!ok) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    req.session.userId = user.id;
+    res.json({ ok: true });
+});
+
 app.get("/set", (req, res) => {
     req.session.test = "hello";
     res.json({ set: true });
@@ -62,5 +79,20 @@ app.get("/set", (req, res) => {
 app.get("/get", (req, res) => {
     res.json({ value: req.session.test || null });
 });
+app.get("/api/me", (req, res) => {
+    const id = req.session.userId;
+    if (!id) return res.json({ user: null });
 
-app.listen(4000, () => console.log("Backend on 4000"));
+    const user = users.find(u => u.id === id);
+    if (!user) return res.json({ user: null });
+
+    res.json({
+        user: { email: user.email, role: user.role }
+    });
+});
+app.post("/api/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.clearCookie("sid");
+        res.json({ ok: true });
+    })
+})
