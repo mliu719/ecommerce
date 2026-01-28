@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
-const API = "http://localhost:4000";
+const API = process.env.REACT_APP_API_URL;
+// const API = "http://localhost:4000"
 export default function ShopPage({ user, onSignOut }) {
 
     const [products, setProducts] = useState([

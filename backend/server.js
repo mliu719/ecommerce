@@ -1,9 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
 const users = []; //{id, email, pswhash, role}
 const app = express();
-
+const PORT = process.env.PORT || 4000;
 app.listen(4000, () => console.log("Backend on 4000"));
 const products = [
     { id: 1, name: 'Laptop', price: 999, stock: 5, description: 'Work machine', category: 'Electronics', imageUrl: '' },
@@ -15,7 +16,7 @@ const products = [
 
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: process.env.CLIENT_ORIGIN,
         credentials: true,
     })
 );
