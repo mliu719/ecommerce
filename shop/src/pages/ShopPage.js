@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
-
+const API = "http://localhost:4000";
 export default function ShopPage({ user, onSignOut }) {
 
     const [products, setProducts] = useState([
@@ -17,7 +17,7 @@ export default function ShopPage({ user, onSignOut }) {
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     useEffect(() => {
-        fetch("http://localhost:4000/api/products", {
+        fetch(`${API}/api/products`, {
             credentials: "include", //carry cookies
         })
             .then(r => r.json())
