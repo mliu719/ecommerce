@@ -1,6 +1,9 @@
-function Cart({ items, onUpdateQuantity, onRemove, onCheckout }) {
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
+function Cart({ items, onUpdateQuantity, onRemove, onCheckout, promo, promoInput, onApplyPromo, onPromoInputChange }) {
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const discount = promo ? Math.round(subtotal * promo.percent / 100)
+        : 0;
+    const total = subtotal - discount
+    console.log("promoInput:", promoInput, "promo:", promo, "onApplyPromo type:", typeof onApplyPromo);
     return (
         <div>
             <h2>Cart ({items.length})</h2>
@@ -21,8 +24,26 @@ function Cart({ items, onUpdateQuantity, onRemove, onCheckout }) {
                             <button onClick={() => onUpdateQuantity(i.id, i.quantity + 1)}> + </button>
                             <button onClick={() => onUpdateQuantity(i.id, i.quantity - 1)}> - </button>
                             <button onClick={() => onRemove(i.id)}>remove</button>
+
                         </div>
                     ))}
+                    <div>
+                        <input
+                            value={promoInput}
+                            onChange={e => onPromoInputChange(e.target.value)}
+                            placeholder="Promo code"
+                        />
+                        <button onClick={onApplyPromo}>Apply</button>
+                    </div>
+                    <p>{promo && `${promo.code} applied`} </p>
+
+                    {subtotal > 0 && (
+                        <div>
+                            <div>Subtotal: ${subtotal}</div>
+                            {promo && <div>Promo {promo.code}: -${discount}</div>}
+                            <strong>Total: ${total}</strong>
+                        </div>
+                    )}
                 </>
             )}
             <button onClick={onCheckout} disabled={items.length === 0}>Checkout</button>

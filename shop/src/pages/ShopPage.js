@@ -12,7 +12,10 @@ export default function ShopPage({ user, onSignOut }) {
 
     const [role, setRole] = useState('customer'); // 'owner' | 'customer'
 
-    const [cart, setCart] = useState([])
+    const [cart, setCart] = useState([])// cart item: { id, name, price, quantity }
+    const [promoInput, setPromoInput] = useState("");
+    const [promo, setPromo] = useState(null);//validated promo
+    // promo: { code, percent }
     const [orders, setOrders] = useState([]);
     const categories = ['Category1', 'Category2', 'Category3'];
     const [searchInput, setSearchInput] = useState("");
@@ -73,6 +76,12 @@ export default function ShopPage({ user, onSignOut }) {
     }
 
 
+    function applyPromo() {
+        const code = promoInput.trim().toUpperCase();
+        if (code === "SAVE10") setPromo({ code, percent: 10 });
+        else if (code === "SAVE20") setPromo({ code, percent: 20 });
+        else setPromo(null);
+    }
     function createProduct(payload) {
         const newProduct = { id: Date.now(), ...payload };
         setProducts(prev => [newProduct, ...prev]);
@@ -114,6 +123,10 @@ export default function ShopPage({ user, onSignOut }) {
                     onUpdateQuantity={updateQuantity}
                     orders={orders}
                     onCheckout={checkout}
+                    promoInput={promoInput}
+                    onPromoInputChange={setPromoInput}
+                    promo={promo}
+                    onApplyPromo={applyPromo}
                 />
 
             ) : (

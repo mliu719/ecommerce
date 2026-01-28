@@ -13,7 +13,12 @@ const products = [
     { id: 4, name: 'Keyboard', price: 89, stock: 15, description: 'Mechanical', category: 'Accessories', imageUrl: '' },
 ];
 const orders = [];
-
+function requireAuth(req, res, next) {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+    next();
+}
 
 app.use(
     cors({

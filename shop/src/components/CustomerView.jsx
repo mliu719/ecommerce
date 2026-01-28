@@ -1,7 +1,8 @@
 import Cart from "./Cart";
 import Orders from "./Orders";
 import ProductList from "./ProductList";
-function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, orders, onCheckout, }) {
+
+function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, orders, onCheckout, promo, promoInput, onApplyPromo, onPromoInputChange }) {
 
     return (
         <div style={{ border: '1px solid #5257e5ff', padding: 12 }}>
@@ -14,6 +15,12 @@ function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, order
                 onRemove={onRemove}
                 onUpdateQuantity={onUpdateQuantity}
                 onCheckout={onCheckout}
+                promoInput={promoInput}
+                onPromoInputChange={onPromoInputChange}
+                promo={promo}
+                onApplyPromo={onApplyPromo}
+
+
             />
             <Orders orders={orders} />
         </div>
