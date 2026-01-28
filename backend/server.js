@@ -1,0 +1,66 @@
+const express = require("express");
+const session = require("express-session");
+const cors = require("cors");
+const users = []; //{id, email, pswhash, role}
+const app = express();
+
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+    })
+);
+
+app.use(
+    session({
+        name: "sid",
+        secret: "dev-secret",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+        },
+    })
+);
+app.use(express.json());
+
+app.post("/api/signup", async (req, res) => {
+    const { email, password, role } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "Missing fields" });
+    }
+
+    if (password.length < 6) {
+        return res.status(400).json({ error: "Password too short" });
+    }
+
+    const exists = users.some(u => u.email === email);
+    if (exists) {
+        return res.status(409).json({ error: "Email exists" });
+    }
+
+    const passwordHash = await require("bcrypt").hash(password, 10);
+
+    const user = {
+        id: Date.now(),
+        email,
+        passwordHash,
+        role: role === "owner" ? "owner" : "customer",
+    };
+
+    users.push(user);
+    res.status(201).json({ ok: true });
+});
+app.get("/set", (req, res) => {
+    req.session.test = "hello";
+    res.json({ set: true });
+});
+
+app.get("/get", (req, res) => {
+    res.json({ value: req.session.test || null });
+});
+
+app.listen(4000, () => console.log("Backend on 4000"));
