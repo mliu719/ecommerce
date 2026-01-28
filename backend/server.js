@@ -3,7 +3,16 @@ const session = require("express-session");
 const cors = require("cors");
 const users = []; //{id, email, pswhash, role}
 const app = express();
+
 app.listen(4000, () => console.log("Backend on 4000"));
+const products = [
+    { id: 1, name: 'Laptop', price: 999, stock: 5, description: 'Work machine', category: 'Electronics', imageUrl: '' },
+    { id: 2, name: 'Phone', price: 699, stock: 10, description: 'Daily driver', category: 'Electronics', imageUrl: '' },
+    { id: 3, name: 'Mouse', price: 29, stock: 20, description: 'Wireless', category: 'Accessories', imageUrl: '' },
+    { id: 4, name: 'Keyboard', price: 89, stock: 15, description: 'Mechanical', category: 'Accessories', imageUrl: '' },
+];
+
+
 app.use(
     cors({
         origin: "http://localhost:3000",
@@ -96,3 +105,6 @@ app.post("/api/logout", (req, res) => {
         res.json({ ok: true });
     })
 })
+app.get("/api/products", (req, res) => {
+    res.json({ products });
+});

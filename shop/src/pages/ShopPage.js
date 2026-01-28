@@ -1,5 +1,5 @@
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
@@ -7,11 +7,8 @@ import OwnerView from '../components/OwnerView';
 export default function ShopPage({ user, onSignOut }) {
 
     const [products, setProducts] = useState([
-        { id: 1, name: 'Laptop', price: 999, stock: 5, description: 'Work machine', category: 'Electronics', imageUrl: '' },
-        { id: 2, name: 'Phone', price: 699, stock: 10, description: 'Daily driver', category: 'Electronics', imageUrl: '' },
-        { id: 3, name: 'Mouse', price: 29, stock: 20, description: 'Wireless', category: 'Accessories', imageUrl: '' },
-        { id: 4, name: 'Keyboard', price: 89, stock: 15, description: 'Mechanical', category: 'Accessories', imageUrl: '' },
     ]);
+
     const [role, setRole] = useState('customer'); // 'owner' | 'customer'
 
     const [cart, setCart] = useState([])
@@ -19,7 +16,13 @@ export default function ShopPage({ user, onSignOut }) {
     const categories = ['Category1', 'Category2', 'Category3'];
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
-
+    useEffect(() => {
+        fetch("http://localhost:4000/api/products", {
+            credentials: "include", //carry cookies
+        })
+            .then(r => r.json())
+            .then(d => setProducts(d.products || []));
+    }, []);
 
 
     const filteredProducts = useMemo(() => {
