@@ -2,7 +2,7 @@ import Cart from "./Cart";
 import Orders from "./Orders";
 import ProductList from "./ProductList";
 
-function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, orders, onCheckout, promo, promoInput, onApplyPromo, onPromoInputChange }) {
+function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, orders, onCheckout, promo, promoInput, onApplyPromo, onPromoInputChange, total, subtotal }) {
 
     return (
         <div style={{ border: '1px solid #5257e5ff', padding: 12 }}>
@@ -19,6 +19,8 @@ function CustomerView({ products, cart, onAdd, onRemove, onUpdateQuantity, order
                 onPromoInputChange={onPromoInputChange}
                 promo={promo}
                 onApplyPromo={onApplyPromo}
+                total={total}
+                subtotal={subtotal}
 
 
             />

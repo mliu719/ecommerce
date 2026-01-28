@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
-const API = process.env.REACT_APP_API_URL;
+const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 // const API = "http://localhost:4000"
 export default function ShopPage({ user, onSignOut }) {
 
@@ -16,10 +16,15 @@ export default function ShopPage({ user, onSignOut }) {
     const [promoInput, setPromoInput] = useState("");
     const [promo, setPromo] = useState(null);//validated promo
     // promo: { code, percent }
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const discount = promo ? Math.round(subtotal * promo.percent / 100) : 0;
+
+    const total = subtotal - discount;
     const [orders, setOrders] = useState([]);
     const categories = ['Category1', 'Category2', 'Category3'];
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
+
     useEffect(() => {
         fetch(`${API}/api/products`, {
             credentials: "include", //carry cookies
@@ -91,16 +96,32 @@ export default function ShopPage({ user, onSignOut }) {
     }
 
 
-    function checkout() {
-        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const order = {
-            id: Date.now(),
-            items: cart,
-            total,
-            date: new Date().toISOString(),
-        };
-        setOrders(prev => [order, ...prev]);
+    async function checkout() {
+        const items = cart.map(i => ({
+            productId: i.id,
+            quantity: i.quantity
+        }))
+        const r = await fetch(`${API}/api/orders`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                items,
+                total,
+                promo: promo?.code || null,
+            }),
+        });
+
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Checkout failed");
+
         setCart([]);
+        setPromo(null);
+        setPromoInput("");
+
+        const r2 = await fetch(`${API}/api/orders`, { credentials: "include" });
+        const d2 = await r2.json();
+        setOrders(d2.orders || []);
     }
 
     return (
@@ -127,6 +148,8 @@ export default function ShopPage({ user, onSignOut }) {
                     onPromoInputChange={setPromoInput}
                     promo={promo}
                     onApplyPromo={applyPromo}
+                    total={total}
+                    subtotal={subtotal}
                 />
 
             ) : (

@@ -70,7 +70,7 @@ app.post("/api/signup", async (req, res) => {
     users.push(user);
     res.status(201).json({ ok: true });
 });
-app.post("/api/login", async (req, res) => {
+app.post("/api/signin", async (req, res) => {
     const { email, password } = req.body;
 
     const user = users.find(u => u.email === email);
@@ -106,7 +106,7 @@ app.get("/api/me", (req, res) => {
         user: { email: user.email, role: user.role }
     });
 });
-app.post("/api/logout", (req, res) => {
+app.post("/api/signout", (req, res) => {
     req.session.destroy(() => {
         res.clearCookie("sid");
         res.json({ ok: true });
@@ -115,6 +115,34 @@ app.post("/api/logout", (req, res) => {
 app.get("/api/products", (req, res) => {
     res.json({ products });
 });
+app.post("/api/orders", requireAuth, (req, res) => {
+    const { items, total, promo } = req.body;
+
+    // basic validation
+    if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ error: "Items required" });
+    }
+    if (typeof total !== "number") {
+        return res.status(400).json({ error: "Invalid total" });
+    }
+
+    // create order (backend owns id + date)
+    const order = {
+        id: Date.now(),
+        userEmail: req.session.user.email,
+        items,
+        total,
+        promo: promo || null,
+        createdAt: new Date().toISOString(),
+    };
+
+    // persist
+    orders.unshift(order);
+
+    // respond
+    res.status(201).json({ ok: true, order });
+});
+//reload after checkout
 app.get("/api/orders", requireAuth, (req, res) => {
     const mine = orders.filter(o => o.userId === req.session.userId);
     res.json({ orders: mine });
