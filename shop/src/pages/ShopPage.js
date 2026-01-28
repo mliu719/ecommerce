@@ -180,45 +180,74 @@ export default function ShopPage({ user, onSignOut }) {
     }
 
     return (
-        <div style={{ padding: 20 }}>
-            <Header role={role} setRole={setRole}
-                user={user}
-                onSignOut={onSignOut}
-                searchInput={searchInput}
-                setSearchInput={setSearchInput}
-                onSearch={handleSearchClick}
-                onClear={handleClearSearch}
-            />
-
-            {role === 'customer' ? (
-                <CustomerView
-                    products={filteredProducts}
-                    cart={cart}
-                    onAdd={addToCart}
-                    onRemove={removeFromCart}
-                    onUpdateQuantity={updateQuantity}
-                    orders={orders}
-                    onCheckout={checkout}
-                    promoInput={promoInput}
-                    onPromoInputChange={setPromoInput}
-                    promo={promo}
-                    onApplyPromo={applyPromo}
-                    total={total}
-                    subtotal={subtotal}
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh',
+            position: 'relative'
+        }}>
+            {/* Fixed Header */}
+            <div style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 1000,
+                backgroundColor: 'white',
+                borderBottom: '1px solid #ddd'
+            }}>
+                <Header role={role} setRole={setRole}
+                    user={user}
+                    onSignOut={onSignOut}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    onSearch={handleSearchClick}
+                    onClear={handleClearSearch}
                 />
+            </div>
 
-            ) : (
-                <OwnerView
-                    products={products}
-                    categories={categories}
-                    onCreateProduct={createProduct}
-                    onDeleteProduct={deleteProduct}
-                    onUpdateProduct={updateProduct}
-                />
-            )}
+            {/* Main Content */}
+            <main style={{
+                flex: 1,
+                padding: '20px',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                width: '100%',
+                boxSizing: 'border-box'
+            }}>
+                {role === 'customer' ? (
+                    <CustomerView
+                        products={filteredProducts}
+                        cart={cart}
+                        onAdd={addToCart}
+                        onRemove={removeFromCart}
+                        onUpdateQuantity={updateQuantity}
+                        orders={orders}
+                        onCheckout={checkout}
+                        promoInput={promoInput}
+                        onPromoInputChange={setPromoInput}
+                        promo={promo}
+                        onApplyPromo={applyPromo}
+                        total={total}
+                        subtotal={subtotal}
+                    />
 
-            <Footer />
+                ) : (
+                    <OwnerView
+                        products={products}
+                        categories={categories}
+                        onCreateProduct={createProduct}
+                        onDeleteProduct={deleteProduct}
+                        onUpdateProduct={updateProduct}
+                    />
+                )}
+            </main>
 
+            {/* Fixed Footer */}
+            <div style={{
+                backgroundColor: '#f8f9fa',
+                borderTop: '1px solid #dee2e6'
+            }}>
+                <Footer />
+            </div>
         </div>
 
     );
