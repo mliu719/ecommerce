@@ -134,6 +134,22 @@ export default function ShopPage({ user, onSignOut }) {
         setProducts(d2.products || []);
     }
 
+    async function updateProduct(updatedProduct) {
+        const r = await fetch(`${API}/api/products/${updatedProduct.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(updatedProduct),
+        });
+
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || "Failed to update product");
+
+        // Refresh products list
+        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
+        const d2 = await r2.json();
+        setProducts(d2.products || []);
+    }
 
     async function checkout() {
         const items = cart.map(i => ({
@@ -192,9 +208,13 @@ export default function ShopPage({ user, onSignOut }) {
                 />
 
             ) : (
-                <OwnerView products={products} categories={categories}
+                <OwnerView
+                    products={products}
+                    categories={categories}
                     onCreateProduct={createProduct}
-                    onDeleteProduct={deleteProduct} />
+                    onDeleteProduct={deleteProduct}
+                    onUpdateProduct={updateProduct}
+                />
             )}
 
             <Footer />

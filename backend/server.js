@@ -203,3 +203,41 @@ app.delete("/api/products/:id", requireOwner, (req, res) => {
     const deletedProduct = products.splice(productIndex, 1)[0];
     res.json({ ok: true, product: deletedProduct });
 });
+
+app.put("/api/products/:id", requireOwner, (req, res) => {
+    const productId = parseInt(req.params.id);
+    const { name, description, category, price, stock, imageUrl } = req.body;
+
+    if (isNaN(productId)) {
+        return res.status(400).json({ error: "Invalid product ID" });
+    }
+
+    // basic validation
+    if (!name || !name.trim()) {
+        return res.status(400).json({ error: "Product name required" });
+    }
+    if (typeof price !== "number" || price <= 0) {
+        return res.status(400).json({ error: "Invalid price" });
+    }
+    if (typeof stock !== "number" || stock < 0) {
+        return res.status(400).json({ error: "Invalid stock" });
+    }
+
+    const productIndex = products.findIndex(p => p.id === productId);
+    if (productIndex === -1) {
+        return res.status(404).json({ error: "Product not found" });
+    }
+
+    const updatedProduct = {
+        id: productId,
+        name: name.trim(),
+        description: description?.trim() || '',
+        category: category?.trim() || 'Uncategorized',
+        price,
+        stock,
+        imageUrl: imageUrl?.trim() || '',
+    };
+
+    products[productIndex] = updatedProduct;
+    res.json({ ok: true, product: updatedProduct });
+});
