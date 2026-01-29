@@ -193,8 +193,30 @@
   font-size: 12px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 720px) {
   .site-header {
+    flex-wrap: wrap;
     gap: 10px;
+  }
+
+  .site-header__left {
+    order: 1;
+    flex: 1 1 auto;
+  }
+
+  .site-header__right {
+    order: 1;
+    margin-left: auto;
+  }
+
+  .site-header__center {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .site-header__center .site-header__search {
+    width: 100%;
+    max-width: none;
   }
 }

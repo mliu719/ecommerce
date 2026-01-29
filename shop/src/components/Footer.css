@@ -29,6 +29,18 @@
   align-items: flex-end;
 }
 
+@media (max-width: 720px) {
+  .site-footer__inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .site-footer__links {
+    justify-content: center;
+  }
+}
+
 .site-footer__link {
   text-decoration: none;
   color: #666;
