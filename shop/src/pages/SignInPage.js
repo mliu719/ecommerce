@@ -5,15 +5,32 @@ function SignInPage({ onSignIn }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [err, setErr] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
         setErr("");
         try {
-            onSignIn({ email: email.trim(), password });
+            const cleanEmail = email.trim();
+            if (!cleanEmail) {
+                setErr("Email is required.");
+                return;
+            }
+            if (!cleanEmail.includes("@")) {
+                setErr("Please enter a valid email.");
+                return;
+            }
+            if (!password) {
+                setErr("Password is required.");
+                return;
+            }
+            setLoading(true);
+            await onSignIn({ email: cleanEmail, password });
             nav("/shop", { replace: true });
         } catch (ex) {
             setErr(ex.message || "Sign in failed.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -23,9 +40,11 @@ function SignInPage({ onSignIn }) {
             {err ? <div style={{ color: "crimson" }}>{err}</div> : null}
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-                <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
-                <button type="submit">Sign in</button>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" style={{ width: "100%" }} />
+                <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" style={{ width: "100%" }} />
+                <button type="submit" disabled={loading}>
+                    {loading ? "Signing in..." : "Sign in"}
+                </button>
             </form>
 
             <div style={{ marginTop: 12 }}>

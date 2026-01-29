@@ -293,6 +293,24 @@ app.post("/api/signout", (req, res) => {
         res.json({ ok: true });
     })
 })
+app.post("/api/password", requireAuth, async (req, res) => {
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Missing fields" });
+    }
+    if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Password too short" });
+    }
+
+    const ok = await require("bcrypt").compare(currentPassword, req.user.passwordHash);
+    if (!ok) {
+        return res.status(401).json({ error: "Invalid current password" });
+    }
+
+    req.user.passwordHash = await require("bcrypt").hash(newPassword, 10);
+    res.json({ ok: true });
+});
 app.get("/api/products", (req, res) => {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.max(1, Math.min(100, parseInt(req.query.limit, 10) || products.length || 1));

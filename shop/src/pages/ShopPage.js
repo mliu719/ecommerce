@@ -231,7 +231,7 @@ export default function ShopPage({ user, onSignOut }) {
                 backgroundColor: 'white',
                 borderBottom: '1px solid #ddd'
             }}>
-                <Header role={role} setRole={setRole}
+                <Header role={role}
                     user={user}
                     onSignOut={onSignOut}
                     searchInput={searchInput}

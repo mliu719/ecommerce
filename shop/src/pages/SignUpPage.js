@@ -7,8 +7,9 @@ export default function SignUpPage({ onSignUp }) {
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("customer");
     const [err, setErr] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
         setErr("");
 
@@ -30,10 +31,13 @@ export default function SignUpPage({ onSignUp }) {
         }
 
         try {
-            onSignUp({ email: cleanEmail, password, role });
+            setLoading(true);
+            await onSignUp({ email: cleanEmail, password, role });
             nav("/shop", { replace: true });
         } catch (ex) {
             setErr(ex.message || "Sign up failed.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -44,13 +48,15 @@ export default function SignUpPage({ onSignUp }) {
             {err ? <div style={{ color: "crimson" }}>{err}</div> : null}
 
             <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-                <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" />
-                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" style={{ width: "100%" }} />
+                <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" style={{ width: "100%" }} />
+                <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%" }}>
                     <option value="customer">customer</option>
                     <option value="owner">owner</option>
                 </select>
-                <button type="submit">Create account</button>
+                <button type="submit" disabled={loading}>
+                    {loading ? "Creating..." : "Create account"}
+                </button>
             </form>
 
             <div style={{ marginTop: 12 }}>
@@ -59,4 +65,3 @@ export default function SignUpPage({ onSignUp }) {
         </div>
     );
 }
-

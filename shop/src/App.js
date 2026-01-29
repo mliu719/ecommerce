@@ -5,6 +5,7 @@ import ShopPage from "./pages/ShopPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ErrorPage from "./pages/ErrorPage";
+import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
@@ -59,6 +60,18 @@ function App() {
     setUser(meData.user);
   }
 
+  async function updatePassword({ currentPassword, newPassword }) {
+    const r = await fetch(`${API}/api/password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Update failed");
+  }
+
   async function signOut() {
     await fetch(`${API}/api/signout`, {
       method: "POST",
@@ -94,6 +107,11 @@ function App() {
       <Route path="/shop" element={
         <RequireAuth user={user}>
           <ShopPage user={user} onSignOut={signOut} />
+        </RequireAuth>}
+      />
+      <Route path="/password" element={
+        <RequireAuth user={user}>
+          <UpdatePasswordPage onUpdatePassword={updatePassword} />
         </RequireAuth>}
       />
       <Route path="/error" element={<ErrorPage />} />
