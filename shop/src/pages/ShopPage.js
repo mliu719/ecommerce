@@ -4,6 +4,7 @@ import Cart from '../components/Cart';
 import CustomerView from '../components/CustomerView';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Orders from '../components/Orders';
 import OwnerView from '../components/OwnerView';
 import "./ShopPage.css";
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
@@ -15,6 +16,7 @@ export default function ShopPage({ user, onSignOut }) {
 
     const [role, setRole] = useState(user?.role || 'customer'); // 'owner' | 'customer'
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isOrdersOpen, setIsOrdersOpen] = useState(false);
 
     const [cart, setCart] = useState([])// cart item: { id, name, price, quantity }
     const [promoInput, setPromoInput] = useState("");
@@ -234,7 +236,14 @@ export default function ShopPage({ user, onSignOut }) {
                     onClear={handleClearSearch}
                     showCart={role === 'customer'}
                     cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
-                    onCartClick={() => setIsCartOpen(true)}
+                    onCartClick={() => {
+                        setIsOrdersOpen(false);
+                        setIsCartOpen(true);
+                    }}
+                    onOrdersClick={() => {
+                        setIsCartOpen(false);
+                        setIsOrdersOpen(true);
+                    }}
                 />
             </div>
 
@@ -244,7 +253,6 @@ export default function ShopPage({ user, onSignOut }) {
                     <CustomerView
                         products={filteredProducts}
                         onAdd={addToCart}
-                        orders={orders}
                     />
 
                 ) : (
@@ -262,11 +270,14 @@ export default function ShopPage({ user, onSignOut }) {
             <div className="shop-page__footer">
                 <Footer />
             </div>
-            {role === 'customer' && (
+            {(role === 'customer' || user) && (
                 <>
-                    {isCartOpen && (
+                    {(isCartOpen || isOrdersOpen) && (
                         <div
-                            onClick={() => setIsCartOpen(false)}
+                            onClick={() => {
+                                setIsCartOpen(false);
+                                setIsOrdersOpen(false);
+                            }}
                             className="shop-page__overlay"
                         />
                     )}
@@ -288,6 +299,17 @@ export default function ShopPage({ user, onSignOut }) {
                                 promo={promo}
                                 onApplyPromo={applyPromo}
                             />
+                        </div>
+                    </aside>
+                    <aside
+                        className={`shop-page__drawer${isOrdersOpen ? " shop-page__drawer--open" : ""}`}
+                    >
+                        <div className="shop-page__drawer-header">
+                            <strong>Your Orders</strong>
+                            <button className="shop-page__drawer-close" onClick={() => setIsOrdersOpen(false)}>Close</button>
+                        </div>
+                        <div className="shop-page__drawer-body">
+                            <Orders orders={orders} />
                         </div>
                     </aside>
                 </>

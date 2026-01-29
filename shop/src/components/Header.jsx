@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 
-function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, onSignOut, showCart, cartCount = 0, onCartClick = () => { } }) {
+function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, onSignOut, showCart, cartCount = 0, onCartClick = () => { }, onOrdersClick = () => { } }) {
     const nav = useNavigate();
     const showCartButton = showCart !== false;
     const [menuOpen, setMenuOpen] = useState(false);
@@ -67,6 +67,15 @@ function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, on
                         <div
                             className={`site-header__menu-panel${menuOpen ? " site-header__menu-panel--open" : ""}`}
                         >
+                            <button
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    onOrdersClick();
+                                }}
+                                className="site-header__menu-item"
+                            >
+                                Orders
+                            </button>
                             <Link
                                 to="/password"
                                 onClick={() => setMenuOpen(false)}

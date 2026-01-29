@@ -1,8 +1,7 @@
 import "./CustomerView.css";
-import Orders from "./Orders";
 import ProductList from "./ProductList";
 
-function CustomerView({ products, onAdd, orders }) {
+function CustomerView({ products, onAdd }) {
 
     return (
         <div className="customer-view">
@@ -10,7 +9,6 @@ function CustomerView({ products, onAdd, orders }) {
             <div className="customer-view__panel">
                 <ProductList products={products} onAdd={onAdd} />
             </div>
-            <Orders orders={orders} />
         </div>
 
     );
