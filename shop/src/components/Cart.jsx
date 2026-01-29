@@ -15,11 +15,26 @@ function Cart({ items, onUpdateQuantity, onRemove, onCheckout, promo, promoInput
             ) : (
                 <>
                     {items.map(i => (
-                        <div>
-                            <div key={i.id} style={{ borderTop: '1px solid #f2f2f2', paddingTop: 8, marginTop: 8 }}>
-                                {i.name}
+                        <div key={i.id} style={{ borderTop: '1px solid #f2f2f2', paddingTop: 8, marginTop: 8 }}>
+                            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                {i.imageUrl && (
+                                    <img
+                                        src={i.imageUrl}
+                                        alt={i.name}
+                                        style={{
+                                            width: 56,
+                                            height: 56,
+                                            objectFit: 'cover',
+                                            borderRadius: 6,
+                                            border: '1px solid #eee'
+                                        }}
+                                    />
+                                )}
+                                <div>
+                                    <div>{i.name}</div>
+                                    <div>Quantity: {i.quantity}</div>
+                                </div>
                             </div>
-                            <div>Quantity: {i.quantity}</div>
 
                             <button onClick={() => onUpdateQuantity(i.id, i.quantity + 1)}> + </button>
                             <button onClick={() => onUpdateQuantity(i.id, i.quantity - 1)}> - </button>
