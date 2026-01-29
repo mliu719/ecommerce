@@ -176,6 +176,11 @@ function requireAuth(req, res, next) {
     if (!req.session.userId) {
         return res.status(401).json({ error: "Not authenticated" });
     }
+    const user = users.find(u => u.id === req.session.userId);
+    if (!user) {
+        return res.status(401).json({ error: "User not found" });
+    }
+    req.user = user;
     next();
 }
 
@@ -185,9 +190,13 @@ function requireOwner(req, res, next) {
     }
 
     const user = users.find(u => u.id === req.session.userId);
-    if (!user || user.role !== 'owner') {
+    if (!user) {
+        return res.status(401).json({ error: "User not found" });
+    }
+    if (user.role !== 'owner') {
         return res.status(403).json({ error: "Owner access required" });
     }
+    req.user = user;
     next();
 }
 
@@ -300,7 +309,7 @@ app.post("/api/orders", requireAuth, (req, res) => {
     // create order (backend owns id + date)
     const order = {
         id: Date.now(),
-        userEmail: req.session.user.email,
+        userEmail: req.user.email,
         items,
         total,
         promo: promo || null,
@@ -315,7 +324,7 @@ app.post("/api/orders", requireAuth, (req, res) => {
 });
 //reload after checkout
 app.get("/api/orders", requireAuth, (req, res) => {
-    const mine = orders.filter(o => o.userEmail === req.session.user.email);
+    const mine = orders.filter(o => o.userEmail === req.user.email);
     res.json({ orders: mine });
 });
 
