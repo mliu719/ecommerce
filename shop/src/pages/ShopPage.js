@@ -84,12 +84,16 @@ export default function ShopPage({ user, onSignOut }) {
     }, [cart, user]);
 
     useEffect(() => {
+        if (!user) {
+            setOrders([]);
+            return;
+        }
         fetch(`${API}/api/orders`, {
             credentials: "include",
         })
             .then(r => r.json())
             .then(d => setOrders(d.orders || []));
-    }, []);
+    }, [user]);
 
     const filteredProducts = useMemo(() => {
         const q = appliedSearch.trim().toLowerCase();

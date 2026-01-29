@@ -104,11 +104,7 @@ function App() {
 
       } />
 
-      <Route path="/shop" element={
-        <RequireAuth user={user}>
-          <ShopPage user={user} onSignOut={signOut} />
-        </RequireAuth>}
-      />
+      <Route path="/shop" element={<ShopPage user={user} onSignOut={signOut} />} />
       <Route path="/password" element={
         <RequireAuth user={user}>
           <UpdatePasswordPage onUpdatePassword={updatePassword} />

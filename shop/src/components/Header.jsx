@@ -85,8 +85,12 @@ function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, on
                             </button>
                         </div>
                     </div>
+                ) : (
+                    <Link className="site-header__btn site-header__btn--primary" to="/signin">Sign In</Link>
+                )}
+                {user ? (
+                    <span className="site-header__role">{role === 'owner' ? 'Admin' : 'Customer'}</span>
                 ) : null}
-                {role ? <span className="site-header__role"> {role === 'owner' ? 'admin' : role}</span> : null}
             </div>
         </div>
     );
