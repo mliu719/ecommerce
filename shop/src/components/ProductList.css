@@ -98,6 +98,9 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .product-list__btn--edit {
@@ -110,6 +113,10 @@
 
 .product-list__btn--add {
   background-color: #1f6feb;
+}
+
+.product-list__btn--view {
+  background-color: #6c757d;
 }
 
 .product-list__pagination {

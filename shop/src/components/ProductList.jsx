@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import "./ProductList.css";
 
 const ITEMS_PER_PAGE = 9;
@@ -52,8 +53,10 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                         </label>
                     </div>
                     <div className="product-list__grid">
-                        {visibleProducts.map((p) => (
-                            <div key={p.id} className="product-list__card">
+                        {visibleProducts.map((p) => {
+                            const productId = p.id ?? p._id;
+                            return (
+                            <div key={productId || p.name} className="product-list__card">
                                 <h4 className="product-list__name">{p.name}</h4>
                                 <p className="product-list__desc">
                                     {p.description || "No description"}
@@ -75,6 +78,14 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                                 )}
 
                                 <div className="product-list__actions">
+                                    {productId ? (
+                                        <Link
+                                            to={`/product/${productId}`}
+                                            className="product-list__btn product-list__btn--view"
+                                        >
+                                            View
+                                        </Link>
+                                    ) : null}
                                     {canDelete && (
                                         <>
                                             <button
@@ -102,7 +113,7 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                                     )}
                                 </div>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 </>
             )}

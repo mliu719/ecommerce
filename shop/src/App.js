@@ -6,6 +6,7 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ErrorPage from "./pages/ErrorPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
@@ -105,6 +106,7 @@ function App() {
       } />
 
       <Route path="/shop" element={<ShopPage user={user} onSignOut={signOut} />} />
+      <Route path="/product/:id" element={<ProductDetailPage />} />
       <Route path="/password" element={
         <RequireAuth user={user}>
           <UpdatePasswordPage onUpdatePassword={updatePassword} />

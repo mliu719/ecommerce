@@ -328,6 +328,19 @@ app.get("/api/products", (req, res) => {
         totalPages,
     });
 });
+app.get("/api/products/:id", (req, res) => {
+    const productId = parseInt(req.params.id, 10);
+    if (isNaN(productId)) {
+        return res.status(400).json({ error: "Invalid product ID" });
+    }
+
+    const product = products.find((p) => p.id === productId);
+    if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json({ product });
+});
 app.get("/api/cart", requireAuth, (req, res) => {
     const key = req.user.email;
     const rawItems = cartStore.get(key) || [];

@@ -7,10 +7,13 @@ import Header from '../components/Header';
 import Orders from '../components/Orders';
 import OwnerView from '../components/OwnerView';
 import "./ShopPage.css";
+import { useLocation, useNavigate } from 'react-router-dom';
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 // const API = "http://localhost:4000"
 
 export default function ShopPage({ user, onSignOut }) {
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const [products, setProducts] = useState([]);
 
@@ -55,6 +58,19 @@ export default function ShopPage({ user, onSignOut }) {
 
             })
     }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const addId = params.get("add");
+        if (!addId) return;
+        const productId = parseInt(addId, 10);
+        if (!productId || products.length === 0) return;
+        const product = products.find((p) => p.id === productId);
+        if (product) {
+            addToCart(product);
+        }
+        navigate("/shop", { replace: true });
+    }, [location.search, products]);
 
     useEffect(() => {
         if (!user) return;
