@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CustomerView from '../components/CustomerView';
 import Cart from '../components/Cart';
 import Footer from '../components/Footer';
@@ -27,6 +27,7 @@ export default function ShopPage({ user, onSignOut }) {
     const categories = ['Category1', 'Category2', 'Category3'];
     const [searchInput, setSearchInput] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
+    const cartInitialized = useRef(false);
 
     useEffect(() => {
         // Fetch user info to get role
@@ -51,6 +52,35 @@ export default function ShopPage({ user, onSignOut }) {
 
             })
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+        fetch(`${API}/api/cart`, {
+            credentials: "include",
+        })
+            .then(r => r.json())
+            .then(d => {
+                setCart(d.items || []);
+                cartInitialized.current = true;
+            })
+            .catch(() => {
+                cartInitialized.current = true;
+            });
+    }, [user]);
+
+    useEffect(() => {
+        if (!user || !cartInitialized.current) return;
+        const items = cart.map(i => ({
+            productId: i.id,
+            quantity: i.quantity
+        }));
+        fetch(`${API}/api/cart`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ items })
+        }).catch(() => { });
+    }, [cart, user]);
 
     useEffect(() => {
         fetch(`${API}/api/orders`, {
@@ -89,7 +119,7 @@ export default function ShopPage({ user, onSignOut }) {
         setIsCartOpen(true);
     }
     const removeFromCart = (productId) => {
-        setCart(cart.filter(i => i.id !== productId))
+        setCart(prev => prev.filter(i => i.id !== productId))
     }
 
 
@@ -97,7 +127,7 @@ export default function ShopPage({ user, onSignOut }) {
         if (newQty <= 0) {
             removeFromCart(productId)
         } else {
-            setCart(cart.map(i => i.id === productId ? { ...i, quantity: newQty } : i))
+            setCart(prev => prev.map(i => i.id === productId ? { ...i, quantity: newQty } : i))
         }
     }
 

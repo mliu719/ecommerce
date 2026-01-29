@@ -172,6 +172,7 @@ const products = [
     }
 ];
 const orders = [];
+const cartStore = new Map();
 function requireAuth(req, res, next) {
     if (!req.session.userId) {
         return res.status(401).json({ error: "Not authenticated" });
@@ -293,7 +294,56 @@ app.post("/api/signout", (req, res) => {
     })
 })
 app.get("/api/products", (req, res) => {
-    res.json({ products });
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit, 10) || products.length || 1));
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paged = products.slice(start, end);
+    const total = products.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    res.json({
+        products: paged,
+        page,
+        limit,
+        total,
+        totalPages,
+    });
+});
+app.get("/api/cart", requireAuth, (req, res) => {
+    const key = req.user.email;
+    const rawItems = cartStore.get(key) || [];
+    const items = rawItems.map((row) => {
+        const product = products.find((p) => p.id === row.productId);
+        if (!product) return null;
+        return { ...product, quantity: row.quantity };
+    }).filter(Boolean);
+    res.json({ items });
+});
+app.put("/api/cart", requireAuth, (req, res) => {
+    const { items } = req.body || {};
+    if (!Array.isArray(items)) {
+        return res.status(400).json({ error: "Items must be an array" });
+    }
+    const sanitized = [];
+    for (const item of items) {
+        const productId = parseInt(item.productId, 10);
+        const quantity = parseInt(item.quantity, 10);
+        if (!productId || quantity <= 0) {
+            return res.status(400).json({ error: "Invalid cart items" });
+        }
+        const exists = products.some((p) => p.id === productId);
+        if (!exists) {
+            return res.status(400).json({ error: "Unknown product in cart" });
+        }
+        sanitized.push({ productId, quantity });
+    }
+    cartStore.set(req.user.email, sanitized);
+    res.json({ ok: true });
+});
+app.delete("/api/cart", requireAuth, (req, res) => {
+    cartStore.delete(req.user.email);
+    res.json({ ok: true });
 });
 app.post("/api/orders", requireAuth, (req, res) => {
     const { items, total, promo } = req.body;

@@ -4,6 +4,7 @@ import './App.css';
 import ShopPage from "./pages/ShopPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+import ErrorPage from "./pages/ErrorPage";
 
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
@@ -95,7 +96,8 @@ function App() {
           <ShopPage user={user} onSignOut={signOut} />
         </RequireAuth>}
       />
-      <Route path="*" element={<Navigate to="/shop" replace />} />
+      <Route path="/error" element={<ErrorPage />} />
+      <Route path="*" element={<Navigate to="/error" replace />} />
     </Routes>
 
 
