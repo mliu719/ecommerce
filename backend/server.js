@@ -387,6 +387,29 @@ app.post("/api/orders", requireAuth, (req, res) => {
         return res.status(400).json({ error: "Invalid total" });
     }
 
+    // validate stock and decrement
+    for (const item of items) {
+        const productId = parseInt(item.productId, 10);
+        const quantity = parseInt(item.quantity, 10);
+        if (!productId || quantity <= 0) {
+            return res.status(400).json({ error: "Invalid order items" });
+        }
+        const product = products.find(p => p.id === productId);
+        if (!product) {
+            return res.status(400).json({ error: "Unknown product in order" });
+        }
+        if (product.stock < quantity) {
+            return res.status(400).json({ error: `Insufficient stock for ${product.name}` });
+        }
+    }
+    // decrement after all checks pass
+    for (const item of items) {
+        const productId = parseInt(item.productId, 10);
+        const quantity = parseInt(item.quantity, 10);
+        const product = products.find(p => p.id === productId);
+        product.stock -= quantity;
+    }
+
     // create order (backend owns id + date)
     const order = {
         id: Date.now(),
