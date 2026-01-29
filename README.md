@@ -1,5 +1,12 @@
-# DB Setup (MongoDB) — Short
+# Quick Setup  
+## Frontend
 
+```
+cd shop
+npm install
+npm start
+```
+## DB
 ## 1) Set env
 
 Create `backend/.env`:
