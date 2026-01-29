@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 9;
 
 function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
     const [currentPage, setCurrentPage] = useState(1);
