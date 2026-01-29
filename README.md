@@ -37,3 +37,48 @@ On first start, products are auto-seeded if the collection is empty.
 ```
 mongosh --eval 'use shop; db.products.countDocuments()'
 ```
+
+## API Summary  
+
+Auth
+- `POST /api/signup` (email, password, role)
+- `POST /api/signin` (email, password)
+- `GET /api/me`
+- `POST /api/signout`
+- `POST /api/password` (currentPassword, newPassword)
+
+Products
+- `GET /api/products` (query: `page`, `limit`)
+- `GET /api/products/:id`
+- `POST /api/products` (owner only)
+- `PUT /api/products/:id` (owner only)
+- `DELETE /api/products/:id` (owner only)
+
+Cart (auth)
+- `GET /api/cart`
+- `PUT /api/cart` (items: [{ productId, quantity }])
+- `DELETE /api/cart`
+
+Orders (auth)
+- `GET /api/orders`
+- `POST /api/orders` (items, total, promo?)
+
+## DB Design  
+Collections
+- `users`: email, passwordHash, role
+- `products`: name, description, category, price, stock, imageUrl
+- `carts`: userId, items[{ productId, quantity }]
+- `orders`: userId, items[{ productId, quantity, priceAtPurchase }], total, promo
+
+Notes
+- MongoDB auto-creates DB/collections on first write.
+- Product list is seeded on server start if empty.
+
+## Redux  
+
+Store slices
+- `auth`: user + auth thunks (signup/signin/signout/me/password)
+- `products`: product list + CRUD thunks
+- `cart`: cart items + fetch/save
+- `orders`: orders list + checkout
+- `ui`: search + promo UI state
