@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import CustomerView from '../components/CustomerView';
+import Cart from '../components/Cart';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
@@ -12,6 +13,7 @@ export default function ShopPage({ user, onSignOut }) {
     const [products, setProducts] = useState([]);
 
     const [role, setRole] = useState(user?.role || 'customer'); // 'owner' | 'customer'
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const [cart, setCart] = useState([])// cart item: { id, name, price, quantity }
     const [promoInput, setPromoInput] = useState("");
@@ -204,6 +206,9 @@ export default function ShopPage({ user, onSignOut }) {
                     setSearchInput={setSearchInput}
                     onSearch={handleSearchClick}
                     onClear={handleClearSearch}
+                    showCart={role === 'customer'}
+                    cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
+                    onCartClick={() => setIsCartOpen(true)}
                 />
             </div>
 
@@ -219,18 +224,8 @@ export default function ShopPage({ user, onSignOut }) {
                 {role === 'customer' ? (
                     <CustomerView
                         products={filteredProducts}
-                        cart={cart}
                         onAdd={addToCart}
-                        onRemove={removeFromCart}
-                        onUpdateQuantity={updateQuantity}
                         orders={orders}
-                        onCheckout={checkout}
-                        promoInput={promoInput}
-                        onPromoInputChange={setPromoInput}
-                        promo={promo}
-                        onApplyPromo={applyPromo}
-                        total={total}
-                        subtotal={subtotal}
                     />
 
                 ) : (
@@ -251,6 +246,56 @@ export default function ShopPage({ user, onSignOut }) {
             }}>
                 <Footer />
             </div>
+            {role === 'customer' && (
+                <>
+                    {isCartOpen && (
+                        <div
+                            onClick={() => setIsCartOpen(false)}
+                            style={{
+                                position: 'fixed',
+                                inset: 0,
+                                backgroundColor: 'rgba(0,0,0,0.35)',
+                                zIndex: 1200
+                            }}
+                        />
+                    )}
+                    <aside
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            right: 0,
+                            width: '360px',
+                            maxWidth: '90vw',
+                            height: '100vh',
+                            backgroundColor: 'white',
+                            borderLeft: '1px solid #ddd',
+                            boxShadow: '-4px 0 12px rgba(0,0,0,0.1)',
+                            transform: isCartOpen ? 'translateX(0)' : 'translateX(100%)',
+                            transition: 'transform 200ms ease',
+                            zIndex: 1300,
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <strong>Your Cart</strong>
+                            <button onClick={() => setIsCartOpen(false)}>Close</button>
+                        </div>
+                        <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                            <Cart
+                                items={cart}
+                                onRemove={removeFromCart}
+                                onUpdateQuantity={updateQuantity}
+                                onCheckout={checkout}
+                                promoInput={promoInput}
+                                onPromoInputChange={setPromoInput}
+                                promo={promo}
+                                onApplyPromo={applyPromo}
+                            />
+                        </div>
+                    </aside>
+                </>
+            )}
         </div>
 
     );
