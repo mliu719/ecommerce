@@ -1,0 +1,12 @@
+.customer-view {
+  padding: 12px;
+}
+
+.customer-view__title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+}
+
+.customer-view__panel {
+  margin-top: 12px;
+}

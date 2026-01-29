@@ -1,0 +1,154 @@
+.product-list {
+  width: 100%;
+}
+
+.product-list__empty {
+  color: #666;
+  font-style: italic;
+}
+
+.product-list__sort {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.product-list__sort-label {
+  font-size: 13px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.product-list__sort-select {
+  padding: 4px 6px;
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+}
+
+.product-list__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.product-list__card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+}
+
+.product-list__name {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.product-list__desc {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.product-list__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.product-list__price {
+  font-weight: bold;
+  color: #1f6feb;
+  font-size: 18px;
+}
+
+.product-list__stock {
+  font-size: 12px;
+  color: #666;
+}
+
+.product-list__category {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.product-list__image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.product-list__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.product-list__btn {
+  padding: 6px 12px;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.product-list__btn--edit {
+  background-color: #28a745;
+}
+
+.product-list__btn--delete {
+  background-color: #dc3545;
+}
+
+.product-list__btn--add {
+  background-color: #1f6feb;
+}
+
+.product-list__pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.product-list__page-btn {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.product-list__page-btn:disabled {
+  background-color: #f2f2f2;
+  cursor: not-allowed;
+}
+
+.product-list__page-btn--active {
+  background-color: #1f6feb;
+  border-color: #1f6feb;
+  color: #fff;
+}
+
+.product-list__page-label {
+  font-size: 12px;
+  color: #666;
+  padding: 0 4px;
+}
+
+@media (max-width: 720px) {
+  .product-list__grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}

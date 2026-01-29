@@ -5,6 +5,7 @@ import CustomerView from '../components/CustomerView';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
+import "./ShopPage.css";
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 // const API = "http://localhost:4000"
 
@@ -217,20 +218,9 @@ export default function ShopPage({ user, onSignOut }) {
     }
 
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100vh',
-            position: 'relative'
-        }}>
+        <div className="shop-page">
             {/* Fixed Header */}
-            <div style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 1000,
-                backgroundColor: 'white',
-                borderBottom: '1px solid #ddd'
-            }}>
+            <div className="shop-page__header">
                 <Header role={role}
                     user={user}
                     onSignOut={onSignOut}
@@ -245,14 +235,7 @@ export default function ShopPage({ user, onSignOut }) {
             </div>
 
             {/* Main Content */}
-            <main style={{
-                flex: 1,
-                padding: '20px',
-                maxWidth: '1200px',
-                margin: '0 auto',
-                width: '100%',
-                boxSizing: 'border-box'
-            }}>
+            <main className="shop-page__main">
                 {role === 'customer' ? (
                     <CustomerView
                         products={filteredProducts}
@@ -272,7 +255,7 @@ export default function ShopPage({ user, onSignOut }) {
             </main>
 
             {/* Fixed Footer */}
-            <div>
+            <div className="shop-page__footer">
                 <Footer />
             </div>
             {role === 'customer' && (
@@ -280,37 +263,17 @@ export default function ShopPage({ user, onSignOut }) {
                     {isCartOpen && (
                         <div
                             onClick={() => setIsCartOpen(false)}
-                            style={{
-                                position: 'fixed',
-                                inset: 0,
-                                backgroundColor: 'rgba(0,0,0,0.35)',
-                                zIndex: 1200
-                            }}
+                            className="shop-page__overlay"
                         />
                     )}
                     <aside
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            right: 0,
-                            width: '360px',
-                            maxWidth: '90vw',
-                            height: '100vh',
-                            backgroundColor: 'white',
-                            borderLeft: '1px solid #ddd',
-                            boxShadow: '-4px 0 12px rgba(0,0,0,0.1)',
-                            transform: isCartOpen ? 'translateX(0)' : 'translateX(100%)',
-                            transition: 'transform 200ms ease',
-                            zIndex: 1300,
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
+                        className={`shop-page__drawer${isCartOpen ? " shop-page__drawer--open" : ""}`}
                     >
-                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="shop-page__drawer-header">
                             <strong>Your Cart</strong>
-                            <button onClick={() => setIsCartOpen(false)}>Close</button>
+                            <button className="shop-page__drawer-close" onClick={() => setIsCartOpen(false)}>Close</button>
                         </div>
-                        <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                        <div className="shop-page__drawer-body">
                             <Cart
                                 items={cart}
                                 onRemove={removeFromCart}

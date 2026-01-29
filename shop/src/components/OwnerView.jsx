@@ -2,6 +2,7 @@ import { useState } from 'react';
 import CreateProductForm from "./CreateProductForm";
 import EditProductForm from "./EditProductForm";
 import ProductList from "./ProductList";
+import "./OwnerView.css";
 
 function OwnerView({ products, categories, onCreateProduct, onDeleteProduct, onUpdateProduct }) {
     const [showAddForm, setShowAddForm] = useState(false);
@@ -22,30 +23,23 @@ function OwnerView({ products, categories, onCreateProduct, onDeleteProduct, onU
     };
 
     return (
-        <div style={{ border: '1px solid #f05858ff', padding: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <h2 style={{ margin: 0 }}>Product Management</h2>
+        <div className="owner-view">
+            <div className="owner-view__header">
+                <h2 className="owner-view__title">Product Management</h2>
                 <button
                     onClick={() => {
                         setShowAddForm(!showAddForm);
                         setEditingProduct(null);
                     }}
-                    style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
+                    className="owner-view__toggle"
                 >
                     {showAddForm ? 'Cancel' : 'Add Product'}
                 </button>
             </div>
 
             {showAddForm && (
-                <div style={{ marginBottom: 24, padding: 16, border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
-                    <h3 style={{ marginTop: 0 }}>Add New Product</h3>
+                <div className="owner-view__panel">
+                    <h3 className="owner-view__subtitle">Add New Product</h3>
                     <CreateProductForm
                         categories={categories}
                         onCreate={(payload) => {
@@ -57,7 +51,7 @@ function OwnerView({ products, categories, onCreateProduct, onDeleteProduct, onU
             )}
 
             {editingProduct && (
-                <div style={{ marginBottom: 24 }}>
+                <div className="owner-view__panel">
                     <EditProductForm
                         product={editingProduct}
                         categories={categories}
@@ -67,8 +61,8 @@ function OwnerView({ products, categories, onCreateProduct, onDeleteProduct, onU
                 </div>
             )}
 
-            <div>
-                <h3>Current Products ({products.length})</h3>
+            <div className="owner-view__panel">
+                <h3 className="owner-view__subtitle">Current Products ({products.length})</h3>
                 <ProductList
                     products={products}
                     canDelete

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import "./ProductList.css";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -29,19 +30,20 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
 
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const visibleProducts = sortedProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
     return (
-        <div>
+        <div className="product-list">
             {products.length === 0 ? (
-                <p style={{ color: '#666', fontStyle: 'italic' }}>No products available.</p>
+                <p className="product-list__empty">No products available.</p>
             ) : (
                 <>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-                        <label style={{ fontSize: 13, color: '#555', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div className="product-list__sort">
+                        <label className="product-list__sort-label">
                             Sort by price:
                             <select
                                 value={sortRanking}
                                 onChange={(e) => setSortRanking(e.target.value)}
-                                style={{ padding: '4px 6px' }}
+                                className="product-list__sort-select"
                             >
                                 <option value="default">Default</option>
                                 <option value="low">Low to High</option>
@@ -49,27 +51,18 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                             </select>
                         </label>
                     </div>
-                    <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-                        {visibleProducts.map(p => (
-                            <div key={p.id} style={{
-                                border: '1px solid #ddd',
-                                borderRadius: '8px',
-                                padding: '16px',
-                                backgroundColor: 'white'
-                            }}>
-                                <h4 style={{ margin: '0 0 8px 0', color: '#333' }}>{p.name}</h4>
-                                <p style={{ margin: '4px 0', fontSize: '14px', color: '#666' }}>
-                                    {p.description || 'No description'}
+                    <div className="product-list__grid">
+                        {visibleProducts.map((p) => (
+                            <div key={p.id} className="product-list__card">
+                                <h4 className="product-list__name">{p.name}</h4>
+                                <p className="product-list__desc">
+                                    {p.description || "No description"}
                                 </p>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '12px 0' }}>
-                                    <span style={{ fontWeight: 'bold', color: '#007bff', fontSize: '18px' }}>
-                                        ${p.price}
-                                    </span>
-                                    <span style={{ fontSize: '12px', color: '#666' }}>
-                                        Stock: {p.stock}
-                                    </span>
+                                <div className="product-list__meta">
+                                    <span className="product-list__price">${p.price}</span>
+                                    <span className="product-list__stock">Stock: {p.stock}</span>
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#888', marginBottom: '12px' }}>
+                                <div className="product-list__category">
                                     Category: {p.category}
                                 </div>
 
@@ -77,44 +70,22 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                                     <img
                                         src={p.imageUrl}
                                         alt={p.name}
-                                        style={{
-                                            width: '100%',
-                                            height: '120px',
-                                            objectFit: 'cover',
-                                            borderRadius: '4px',
-                                            marginBottom: '12px'
-                                        }}
+                                        className="product-list__image"
                                     />
                                 )}
 
-                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                <div className="product-list__actions">
                                     {canDelete && (
                                         <>
                                             <button
                                                 onClick={() => onEdit && onEdit(p)}
-                                                style={{
-                                                    padding: '6px 12px',
-                                                    backgroundColor: '#28a745',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '12px'
-                                                }}
+                                                className="product-list__btn product-list__btn--edit"
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => onDelete(p.id)}
-                                                style={{
-                                                    padding: '6px 12px',
-                                                    backgroundColor: '#dc3545',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '12px'
-                                                }}
+                                                className="product-list__btn product-list__btn--delete"
                                             >
                                                 Delete
                                             </button>
@@ -124,15 +95,7 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                                     {onAdd && (
                                         <button
                                             onClick={() => onAdd(p)}
-                                            style={{
-                                                padding: '6px 12px',
-                                                backgroundColor: '#007bff',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer',
-                                                fontSize: '12px'
-                                            }}
+                                            className="product-list__btn product-list__btn--add"
                                         >
                                             Add to Cart
                                         </button>
@@ -145,17 +108,11 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
             )}
 
             {products.length > ITEMS_PER_PAGE && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="product-list__pagination">
                     <button
                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                         disabled={currentPage === 1}
-                        style={{
-                            padding: '6px 10px',
-                            borderRadius: '4px',
-                            border: '1px solid #ddd',
-                            backgroundColor: currentPage === 1 ? '#f2f2f2' : 'white',
-                            cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
-                        }}
+                        className="product-list__page-btn"
                     >
                         Prev
                     </button>
@@ -164,14 +121,7 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                         <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            style={{
-                                padding: '6px 10px',
-                                borderRadius: '4px',
-                                border: '1px solid #ddd',
-                                backgroundColor: page === currentPage ? '#007bff' : 'white',
-                                color: page === currentPage ? 'white' : '#333',
-                                cursor: 'pointer'
-                            }}
+                            className={`product-list__page-btn${page === currentPage ? " product-list__page-btn--active" : ""}`}
                         >
                             {page}
                         </button>
@@ -180,17 +130,11 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                     <button
                         onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                         disabled={currentPage === totalPages}
-                        style={{
-                            padding: '6px 10px',
-                            borderRadius: '4px',
-                            border: '1px solid #ddd',
-                            backgroundColor: currentPage === totalPages ? '#f2f2f2' : 'white',
-                            cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
-                        }}
+                        className="product-list__page-btn"
                     >
                         Next
                     </button>
-                    <span style={{ fontSize: '12px', color: '#666', padding: '0 4px' }}>
+                    <span className="product-list__page-label">
                         Page {currentPage} of {totalPages}
                     </span>
                 </div>
