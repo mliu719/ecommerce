@@ -5,7 +5,6 @@ function Cart({ items, onUpdateQuantity, onRemove, onCheckout, promo, promoInput
     const discount = promo ? Math.round(subtotal * promo.percent / 100)
         : 0;
     const total = subtotal - discount
-    console.log("promoInput:", promoInput, "promo:", promo, "onApplyPromo type:", typeof onApplyPromo);
     return (
         <div className="cart">
             <h2 className="cart__title">Cart ({items.length})</h2>

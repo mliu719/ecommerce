@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from "react-router-dom";
 import './App.css';
 import ShopPage from "./pages/ShopPage";
@@ -7,79 +7,17 @@ import SignUpPage from "./pages/SignUpPage";
 import ErrorPage from "./pages/ErrorPage";
 import UpdatePasswordPage from "./pages/UpdatePasswordPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
-
-const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
+import CartPage from "./pages/CartPage";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMe, signIn, signOut, signUp, updatePassword } from "./store/authSlice";
 
 function App() {
-  const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    // Check if user is authenticated on app load
-    fetch(`${API}/api/me`, {
-      credentials: "include",
-    })
-      .then(r => r.json())
-      .then(d => {
-        setUser(d.user);
-      })
-      .catch(() => {
-        setUser(null);
-      });
-  }, []);
-
-  async function signUp({ email, password, role }) {
-    const r = await fetch(`${API}/api/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password, role }),
-    });
-
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || "Signup failed");
-
-    // After successful signup, user is automatically logged in
-    const meResponse = await fetch(`${API}/api/me`, { credentials: "include" });
-    const meData = await meResponse.json();
-    setUser(meData.user);
-  }
-
-  async function signIn({ email, password }) {
-    const r = await fetch(`${API}/api/signin`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password }),
-    });
-
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || "Signin failed");
-
-    // After successful signin, get user info
-    const meResponse = await fetch(`${API}/api/me`, { credentials: "include" });
-    const meData = await meResponse.json();
-    setUser(meData.user);
-  }
-
-  async function updatePassword({ currentPassword, newPassword }) {
-    const r = await fetch(`${API}/api/password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ currentPassword, newPassword }),
-    });
-
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || "Update failed");
-  }
-
-  async function signOut() {
-    await fetch(`${API}/api/signout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setUser(null);
-  }
+    dispatch(fetchMe());
+  }, [dispatch]);
 
   function RequireAuth({ user, children }) {
     if (!user) return <Navigate to="/signin" replace />;
@@ -98,18 +36,19 @@ function App() {
       <Route path="/signin"
         element={
           <RequireGuest user={user} >
-            <SignInPage onSignIn={signIn} />
+            <SignInPage onSignIn={(payload) => dispatch(signIn(payload)).unwrap()} />
           </RequireGuest>
         } />
-      <Route path="/signup" element={<RequireGuest user={user}> <SignUpPage onSignUp={signUp} /></RequireGuest>
+      <Route path="/signup" element={<RequireGuest user={user}> <SignUpPage onSignUp={(payload) => dispatch(signUp(payload)).unwrap()} /></RequireGuest>
 
       } />
 
-      <Route path="/shop" element={<ShopPage user={user} onSignOut={signOut} />} />
+      <Route path="/shop" element={<ShopPage user={user} onSignOut={() => dispatch(signOut())} />} />
       <Route path="/product/:id" element={<ProductDetailPage />} />
+      <Route path="/cart" element={<CartPage />} />
       <Route path="/password" element={
         <RequireAuth user={user}>
-          <UpdatePasswordPage onUpdatePassword={updatePassword} />
+          <UpdatePasswordPage onUpdatePassword={(payload) => dispatch(updatePassword(payload)).unwrap()} />
         </RequireAuth>}
       />
       <Route path="/error" element={<ErrorPage />} />

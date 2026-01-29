@@ -1,5 +1,6 @@
-
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
 import Cart from '../components/Cart';
 import CustomerView from '../components/CustomerView';
 import Footer from '../components/Footer';
@@ -7,236 +8,139 @@ import Header from '../components/Header';
 import Orders from '../components/Orders';
 import OwnerView from '../components/OwnerView';
 import "./ShopPage.css";
-import { useLocation, useNavigate } from 'react-router-dom';
-const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
-// const API = "http://localhost:4000"
+import { fetchProducts, createProduct, updateProduct, deleteProduct } from "../store/productsSlice";
+import { fetchCart, saveCart, addItem, removeItem, updateQuantity, clearCart } from "../store/cartSlice";
+import { fetchOrders, checkoutOrder, clearOrders } from "../store/ordersSlice";
+import { setSearchInput, setAppliedSearch, setPromoInput, setPromo, clearPromo } from "../store/uiSlice";
 
 export default function ShopPage({ user, onSignOut }) {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const [products, setProducts] = useState([]);
+    const products = useSelector((state) => state.products.items);
+    const cart = useSelector((state) => state.cart.items);
+    const orders = useSelector((state) => state.orders.items);
+    const searchInput = useSelector((state) => state.ui.searchInput);
+    const appliedSearch = useSelector((state) => state.ui.appliedSearch);
+    const promoInput = useSelector((state) => state.ui.promoInput);
+    const promo = useSelector((state) => state.ui.promo);
 
-    const [role, setRole] = useState(user?.role || 'customer'); // 'owner' | 'customer'
+    const role = user?.role || 'customer';
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isOrdersOpen, setIsOrdersOpen] = useState(false);
-
-    const [cart, setCart] = useState([])// cart item: { id, name, price, quantity }
-    const [promoInput, setPromoInput] = useState("");
-    const [promo, setPromo] = useState(null);//validated promo
-    // promo: { code, percent }
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const discount = promo ? Math.round(subtotal * promo.percent / 100) : 0;
-
-    const total = subtotal - discount;
-    const [orders, setOrders] = useState([]);
     const categories = ['Category1', 'Category2', 'Category3'];
-    const [searchInput, setSearchInput] = useState("");
-    const [appliedSearch, setAppliedSearch] = useState("");
     const cartInitialized = useRef(false);
 
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const discount = promo ? Math.round(subtotal * promo.percent / 100) : 0;
+    const total = subtotal - discount;
+
     useEffect(() => {
-        // Fetch user info to get role
-        fetch(`${API}/api/me`, {
-            credentials: "include",
-        })
-            .then(r => r.json())
-            .then(d => {
-                if (d.user) {
-                    setRole(d.user.role);
-                }
+        dispatch(fetchProducts());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!user) {
+            dispatch(clearOrders());
+            return;
+        }
+        dispatch(fetchOrders());
+    }, [user, dispatch]);
+
+    useEffect(() => {
+        if (!user) {
+            dispatch(clearCart());
+            cartInitialized.current = false;
+            return;
+        }
+        cartInitialized.current = false;
+        dispatch(fetchCart())
+            .unwrap()
+            .catch(() => { })
+            .finally(() => {
+                cartInitialized.current = true;
             });
-    }, []);
+    }, [user, dispatch]);
 
     useEffect(() => {
-        fetch(`${API}/api/products`, {
-            credentials: "include", //carry cookies
-        })
-            .then(r => r.json())
-            .then(d => {
-                setProducts(d.products)
-
-            })
-    }, []);
+        if (!user || !cartInitialized.current) return;
+        dispatch(saveCart(cart));
+    }, [cart, user, dispatch]);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const addId = params.get("add");
         if (!addId) return;
-        const productId = parseInt(addId, 10);
-        if (!productId || products.length === 0) return;
-        const product = products.find((p) => p.id === productId);
+        if (products.length === 0) return;
+        const product = products.find((p) => p.id === addId);
         if (product) {
-            addToCart(product);
+            dispatch(addItem(product));
         }
         navigate("/shop", { replace: true });
-    }, [location.search, products]);
-
-    useEffect(() => {
-        if (!user) return;
-        fetch(`${API}/api/cart`, {
-            credentials: "include",
-        })
-            .then(r => r.json())
-            .then(d => {
-                setCart(d.items || []);
-                cartInitialized.current = true;
-            })
-            .catch(() => {
-                cartInitialized.current = true;
-            });
-    }, [user]);
-
-    useEffect(() => {
-        if (!user || !cartInitialized.current) return;
-        const items = cart.map(i => ({
-            productId: i.id,
-            quantity: i.quantity
-        }));
-        fetch(`${API}/api/cart`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ items })
-        }).catch(() => { });
-    }, [cart, user]);
-
-    useEffect(() => {
-        if (!user) {
-            setOrders([]);
-            return;
-        }
-        fetch(`${API}/api/orders`, {
-            credentials: "include",
-        })
-            .then(r => r.json())
-            .then(d => setOrders(d.orders || []));
-    }, [user]);
+    }, [location.search, products, dispatch, navigate]);
 
     const filteredProducts = useMemo(() => {
         const q = appliedSearch.trim().toLowerCase();
         if (!q) return products;
-        return products.filter((p) => p.name.toLowerCase().includes(q));
+        return products.filter((p) => {
+            const name = (p.name || "").toLowerCase();
+            const desc = (p.description || "").toLowerCase();
+            const category = (p.category || "").toLowerCase();
+            return name.includes(q) || desc.includes(q) || category.includes(q);
+        });
     }, [products, appliedSearch]);
 
     const handleSearchClick = () => {
-        setAppliedSearch(searchInput.trim());
-    }
+        dispatch(setAppliedSearch(searchInput.trim()));
+    };
     const handleClearSearch = () => {
-        setSearchInput('');
-        setAppliedSearch('');
-
-    }
+        dispatch(setSearchInput(''));
+        dispatch(setAppliedSearch(''));
+    };
 
     const addToCart = (product) => {
-        const productId = product.id ?? product._id;
-        setCart((prevCart) => {
-            const existInCart = prevCart.find(i => i.id === productId);
-            if (existInCart) {
-                return prevCart.map(
-                    i => i.id === productId ? { ...i, quantity: i.quantity + 1 } : i
-                );
-            }
-            return [...prevCart, { ...product, id: productId, quantity: 1 }];
-        });
+        dispatch(addItem(product));
         setIsCartOpen(true);
-    }
+    };
     const removeFromCart = (productId) => {
-        setCart(prev => prev.filter(i => i.id !== productId))
-    }
-
-
-    const updateQuantity = (productId, newQty) => {
-        if (newQty <= 0) {
-            removeFromCart(productId)
-        } else {
-            setCart(prev => prev.map(i => i.id === productId ? { ...i, quantity: newQty } : i))
-        }
-    }
-
+        dispatch(removeItem(productId));
+    };
+    const updateItemQuantity = (productId, newQty) => {
+        dispatch(updateQuantity({ id: productId, quantity: newQty }));
+    };
 
     function applyPromo() {
         const code = promoInput.trim().toUpperCase();
-        if (code === "SAVE10") setPromo({ code, percent: 10 });
-        else if (code === "SAVE20") setPromo({ code, percent: 20 });
-        else setPromo(null);
+        if (code === "SAVE10") dispatch(setPromo({ code, percent: 10 }));
+        else if (code === "SAVE20") dispatch(setPromo({ code, percent: 20 }));
+        else dispatch(setPromo(null));
     }
 
-    async function createProduct(payload) {
-        const r = await fetch(`${API}/api/products`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(payload),
-        });
-
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error || "Failed to create product");
-
-        // Refresh products list
-        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
-        const d2 = await r2.json();
-        setProducts(d2.products || []);
+    async function createProductHandler(payload) {
+        await dispatch(createProduct(payload)).unwrap();
     }
 
-    async function deleteProduct(id) {
-        const r = await fetch(`${API}/api/products/${id}`, {
-            method: "DELETE",
-            credentials: "include",
-        });
-
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error || "Failed to delete product");
-
-        // Refresh products list
-        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
-        const d2 = await r2.json();
-        setProducts(d2.products || []);
+    async function deleteProductHandler(id) {
+        await dispatch(deleteProduct(id)).unwrap();
     }
 
-    async function updateProduct(updatedProduct) {
-        const r = await fetch(`${API}/api/products/${updatedProduct.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(updatedProduct),
-        });
-
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error || "Failed to update product");
-
-        // Refresh products list
-        const r2 = await fetch(`${API}/api/products`, { credentials: "include" });
-        const d2 = await r2.json();
-        setProducts(d2.products || []);
+    async function updateProductHandler(updatedProduct) {
+        await dispatch(updateProduct(updatedProduct)).unwrap();
     }
 
     async function checkout() {
         const items = cart.map(i => ({
             productId: i.id,
             quantity: i.quantity
-        }))
-        const r = await fetch(`${API}/api/orders`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                items,
-                total,
-                promo: promo?.code || null,
-            }),
-        });
-
-        const d = await r.json();
-        if (!r.ok) throw new Error(d.error || "Checkout failed");
-
-        setCart([]);
-        setPromo(null);
-        setPromoInput("");
-
-        const r2 = await fetch(`${API}/api/orders`, { credentials: "include" });
-        const d2 = await r2.json();
-        setOrders(d2.orders || []);
+        }));
+        await dispatch(checkoutOrder({
+            items,
+            total,
+            promo: promo?.code || null,
+        })).unwrap();
+        dispatch(clearCart());
+        dispatch(clearPromo());
     }
 
     return (
@@ -247,7 +151,7 @@ export default function ShopPage({ user, onSignOut }) {
                     user={user}
                     onSignOut={onSignOut}
                     searchInput={searchInput}
-                    setSearchInput={setSearchInput}
+                    setSearchInput={(value) => dispatch(setSearchInput(value))}
                     onSearch={handleSearchClick}
                     onClear={handleClearSearch}
                     showCart={role === 'customer'}
@@ -265,7 +169,7 @@ export default function ShopPage({ user, onSignOut }) {
 
             {/* Main Content */}
             <main className="shop-page__main">
-                {role === 'customer' ? (
+                {role === 'customer' || !role ? (
                     <CustomerView
                         products={filteredProducts}
                         onAdd={addToCart}
@@ -275,9 +179,9 @@ export default function ShopPage({ user, onSignOut }) {
                     <OwnerView
                         products={filteredProducts}
                         categories={categories}
-                        onCreateProduct={createProduct}
-                        onDeleteProduct={deleteProduct}
-                        onUpdateProduct={updateProduct}
+                        onCreateProduct={createProductHandler}
+                        onDeleteProduct={deleteProductHandler}
+                        onUpdateProduct={updateProductHandler}
                     />
                 )}
             </main>
@@ -286,49 +190,49 @@ export default function ShopPage({ user, onSignOut }) {
             <div className="shop-page__footer">
                 <Footer />
             </div>
-            {(role === 'customer' || user) && (
-                <>
-                    {(isCartOpen || isOrdersOpen) && (
-                        <div
-                            onClick={() => {
-                                setIsCartOpen(false);
-                                setIsOrdersOpen(false);
-                            }}
-                            className="shop-page__overlay"
+            {(isCartOpen || isOrdersOpen) && (
+                <div
+                    onClick={() => {
+                        setIsCartOpen(false);
+                        setIsOrdersOpen(false);
+                    }}
+                    className="shop-page__overlay"
+                />
+            )}
+            {role === 'customer' && (
+                <aside
+                    className={`shop-page__drawer${isCartOpen ? " shop-page__drawer--open" : ""}`}
+                >
+                    <div className="shop-page__drawer-header">
+                        <strong>Your Cart</strong>
+                        <button className="shop-page__drawer-close" onClick={() => setIsCartOpen(false)}>Close</button>
+                    </div>
+                    <div className="shop-page__drawer-body">
+                        <Cart
+                            items={cart}
+                            onRemove={removeFromCart}
+                            onUpdateQuantity={updateItemQuantity}
+                            onCheckout={checkout}
+                            promoInput={promoInput}
+                            onPromoInputChange={(value) => dispatch(setPromoInput(value))}
+                            promo={promo}
+                            onApplyPromo={applyPromo}
                         />
-                    )}
-                    <aside
-                        className={`shop-page__drawer${isCartOpen ? " shop-page__drawer--open" : ""}`}
-                    >
-                        <div className="shop-page__drawer-header">
-                            <strong>Your Cart</strong>
-                            <button className="shop-page__drawer-close" onClick={() => setIsCartOpen(false)}>Close</button>
-                        </div>
-                        <div className="shop-page__drawer-body">
-                            <Cart
-                                items={cart}
-                                onRemove={removeFromCart}
-                                onUpdateQuantity={updateQuantity}
-                                onCheckout={checkout}
-                                promoInput={promoInput}
-                                onPromoInputChange={setPromoInput}
-                                promo={promo}
-                                onApplyPromo={applyPromo}
-                            />
-                        </div>
-                    </aside>
-                    <aside
-                        className={`shop-page__drawer${isOrdersOpen ? " shop-page__drawer--open" : ""}`}
-                    >
-                        <div className="shop-page__drawer-header">
-                            <strong>Your Orders</strong>
-                            <button className="shop-page__drawer-close" onClick={() => setIsOrdersOpen(false)}>Close</button>
-                        </div>
-                        <div className="shop-page__drawer-body">
-                            <Orders orders={orders} />
-                        </div>
-                    </aside>
-                </>
+                    </div>
+                </aside>
+            )}
+            {user && (
+                <aside
+                    className={`shop-page__drawer${isOrdersOpen ? " shop-page__drawer--open" : ""}`}
+                >
+                    <div className="shop-page__drawer-header">
+                        <strong>Your Orders</strong>
+                        <button className="shop-page__drawer-close" onClick={() => setIsOrdersOpen(false)}>Close</button>
+                    </div>
+                    <div className="shop-page__drawer-body">
+                        <Orders orders={orders} />
+                    </div>
+                </aside>
             )}
         </div>
 

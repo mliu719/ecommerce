@@ -11,7 +11,6 @@ function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, on
         onSignOut();
         nav("/signin", { replace: true }); // redirect
     }
-    console.log("Header onSignOut:", onSignOut);
 
     useEffect(() => {
         if (!menuOpen) return;
@@ -30,16 +29,22 @@ function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, on
             <div className="site-header__left">
                 <h1 className="site-header__title">Shop</h1>
             </div>
-            <div className="site-header__center">
+            <form
+                className="site-header__center"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    onSearch();
+                }}
+            >
                 <input
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search products..."
-                className="site-header__search"
-            />
-                <button onClick={onSearch} className="site-header__btn site-header__btn--primary">Search</button>
-                <button onClick={onClear} className="site-header__btn">Clear</button>
-            </div>
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="Search products..."
+                    className="site-header__search"
+                />
+                <button type="submit" className="site-header__btn site-header__btn--primary">Search</button>
+                <button type="button" onClick={onClear} className="site-header__btn">Clear</button>
+            </form>
             <div className="site-header__right">
                 {showCartButton ? (
                     <button

@@ -306,12 +306,15 @@ app.post("/api/password", requireAuth, async (req, res) => {
 
 app.get("/api/products", async (req, res) => {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit, 10) || 0));
+    const limitRaw = parseInt(req.query.limit, 10);
+
+    const limit = Number.isFinite(limitRaw) ? Math.max(1, Math.min(100, limitRaw)) : 20//default 20
     const total = await Product.countDocuments();
     const effectiveLimit = limit || total || 1;
     const totalPages = Math.max(1, Math.ceil(total / effectiveLimit));
 
     const products = await Product.find()
+        .sort({ createdAt: -1 })
         .skip((page - 1) * effectiveLimit)
         .limit(effectiveLimit)
         .lean();

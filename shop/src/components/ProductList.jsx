@@ -95,7 +95,7 @@ function ProductList({ products, onAdd, canDelete, onDelete, onEdit }) {
                                                 Edit
                                             </button>
                                             <button
-                                                onClick={() => onDelete(p.id)}
+                                                onClick={() => onDelete(productId)}
                                                 className="product-list__btn product-list__btn--delete"
                                             >
                                                 Delete
