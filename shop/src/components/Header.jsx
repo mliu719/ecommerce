@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./Header.css";
 
 function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, onSignOut, showCart, cartCount = 0, onCartClick = () => { } }) {
     const nav = useNavigate();
@@ -25,120 +26,68 @@ function Header({ user, role, searchInput, setSearchInput, onSearch, onClear, on
 
     return (
 
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
-            <h1 style={{ margin: 0 }}>Shop</h1>
-            <input
+        <div className="site-header">
+            <div className="site-header__left">
+                <h1 className="site-header__title">Shop</h1>
+            </div>
+            <div className="site-header__center">
+                <input
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search products..."
-                style={{ flex: 1, minWidth: 220, maxWidth: 420 }}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter") onSearch();
-                }}
-
+                className="site-header__search"
             />
-            <button onClick={onSearch}>Search</button>
-            <button onClick={onClear}>Clear</button>
-            {showCartButton ? (
-                <button
-                    onClick={onCartClick}
-                    style={{ position: 'relative' }}
-                    aria-label="Open cart"
-                >
-                    🛒
-                    {cartCount > 0 && (
-                        <span
-                            style={{
-                                position: 'absolute',
-                                top: -6,
-                                right: -6,
-                                background: '#dc3545',
-                                color: 'white',
-                                borderRadius: 999,
-                                fontSize: 10,
-                                padding: '2px 6px',
-                                lineHeight: 1
-                            }}
-                        >
-                            {cartCount}
-                        </span>
-                    )}
-                </button>
-            ) : null}
-            {user ? (
-                <div style={{ position: "relative" }} ref={menuRef}>
+                <button onClick={onSearch} className="site-header__btn site-header__btn--primary">Search</button>
+                <button onClick={onClear} className="site-header__btn">Clear</button>
+            </div>
+            <div className="site-header__right">
+                {showCartButton ? (
                     <button
-                        onClick={() => setMenuOpen((open) => !open)}
-                        style={{
-                            padding: "6px 10px",
-                            border: "1px solid #ddd",
-                            borderRadius: 6,
-                            background: "white",
-                            cursor: "pointer",
-                            fontSize: 14
-                        }}
-                        aria-label="User menu"
+                        onClick={onCartClick}
+                        className="site-header__btn site-header__cart"
+                        aria-label="Open cart"
                     >
-                        {user.email}
+                        🛒
+                        {cartCount > 0 && (
+                            <span className="site-header__badge">
+                                {cartCount}
+                            </span>
+                        )}
                     </button>
-                    <div
-                        style={{
-                            position: "absolute",
-                            right: 0,
-                            top: "100%",
-                            marginTop: 6,
-                            background: "white",
-                            border: "1px solid #ddd",
-                            borderRadius: 8,
-                            boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
-                            minWidth: 190,
-                            zIndex: 10,
-                            display: "flex",
-                            flexDirection: "column",
-                            padding: 6,
-                            maxHeight: menuOpen ? 200 : 0,
-                            opacity: menuOpen ? 1 : 0,
-                            transform: menuOpen ? "translateY(0)" : "translateY(-6px)",
-                            transition: "max-height 180ms ease, opacity 180ms ease, transform 180ms ease",
-                            overflow: "hidden",
-                            pointerEvents: menuOpen ? "auto" : "none"
-                        }}
-                    >
-                        <Link
-                            to="/password"
-                            onClick={() => setMenuOpen(false)}
-                            style={{
-                                padding: "8px 12px",
-                                textDecoration: "none",
-                                color: "#333",
-                                fontSize: 14,
-                                borderRadius: 6
-                            }}
-                        >
-                            Update Password
-                        </Link>
+                ) : null}
+                {user ? (
+                    <div className="site-header__menu" ref={menuRef}>
                         <button
-                            onClick={() => {
-                                setMenuOpen(false);
-                                handleSignOut();
-                            }}
-                            style={{
-                                padding: "8px 12px",
-                                textAlign: "left",
-                                border: "none",
-                                background: "transparent",
-                                cursor: "pointer",
-                                color: "#333",
-                                fontSize: 14,
-                                borderRadius: 6
-                            }}
+                            onClick={() => setMenuOpen((open) => !open)}
+                            className="site-header__menu-btn"
+                            aria-label="User menu"
                         >
-                            Sign Out
+                            {user.email}
                         </button>
+                        <div
+                            className={`site-header__menu-panel${menuOpen ? " site-header__menu-panel--open" : ""}`}
+                        >
+                            <Link
+                                to="/password"
+                                onClick={() => setMenuOpen(false)}
+                                className="site-header__menu-link"
+                            >
+                                Update Password
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    setMenuOpen(false);
+                                    handleSignOut();
+                                }}
+                                className="site-header__menu-item"
+                            >
+                                Sign Out
+                            </button>
+                        </div>
                     </div>
-                </div>
-            ) : null}
-            {role ? <span>Role: {role === 'owner' ? 'admin' : role}</span> : null}
+                ) : null}
+                {role ? <span className="site-header__role"> {role === 'owner' ? 'admin' : role}</span> : null}
+            </div>
         </div>
     );
 }

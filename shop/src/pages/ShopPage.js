@@ -1,7 +1,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import CustomerView from '../components/CustomerView';
 import Cart from '../components/Cart';
+import CustomerView from '../components/CustomerView';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
@@ -97,7 +97,7 @@ export default function ShopPage({ user, onSignOut }) {
     }, [products, appliedSearch]);
 
     const handleSearchClick = () => {
-        setAppliedSearch(searchInput);
+        setAppliedSearch(searchInput.trim());
     }
     const handleClearSearch = () => {
         setSearchInput('');
@@ -262,7 +262,7 @@ export default function ShopPage({ user, onSignOut }) {
 
                 ) : (
                     <OwnerView
-                        products={products}
+                        products={filteredProducts}
                         categories={categories}
                         onCreateProduct={createProduct}
                         onDeleteProduct={deleteProduct}
@@ -272,10 +272,7 @@ export default function ShopPage({ user, onSignOut }) {
             </main>
 
             {/* Fixed Footer */}
-            <div style={{
-                backgroundColor: '#f8f9fa',
-                borderTop: '1px solid #dee2e6'
-            }}>
+            <div>
                 <Footer />
             </div>
             {role === 'customer' && (
