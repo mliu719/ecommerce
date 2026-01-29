@@ -28,9 +28,10 @@ function Header({ user, role, setRole, searchInput, setSearchInput, onSearch, on
             {showCartButton ? (
                 <button
                     onClick={onCartClick}
+                    style={{ position: 'relative' }}
                     aria-label="Open cart"
                 >
-                    🛒 cart
+                    🛒
                     {cartCount > 0 && (
                         <span
                             style={{

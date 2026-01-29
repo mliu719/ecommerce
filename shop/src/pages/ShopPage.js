@@ -76,15 +76,17 @@ export default function ShopPage({ user, onSignOut }) {
     }
 
     const addToCart = (product) => {
-        const existInCart = cart.find(i => i.id === product.id)
-        if (existInCart) {
-            setCart(cart.map(
-                i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-            ))
-        } else {
-            setCart([...cart, { ...product, quantity: 1 }])
-        }
-
+        const productId = product.id ?? product._id;
+        setCart((prevCart) => {
+            const existInCart = prevCart.find(i => i.id === productId);
+            if (existInCart) {
+                return prevCart.map(
+                    i => i.id === productId ? { ...i, quantity: i.quantity + 1 } : i
+                );
+            }
+            return [...prevCart, { ...product, id: productId, quantity: 1 }];
+        });
+        setIsCartOpen(true);
     }
     const removeFromCart = (productId) => {
         setCart(cart.filter(i => i.id !== productId))
