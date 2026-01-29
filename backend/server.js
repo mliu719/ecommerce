@@ -6,11 +6,170 @@ const users = []; //{id, email, pswhash, role}
 const app = express();
 const PORT = process.env.PORT || 4000;
 app.listen(4000, () => console.log("Backend on 4000"));
+
 const products = [
-    { id: 1, name: 'Laptop', price: 999, stock: 5, description: 'Work machine', category: 'Electronics', imageUrl: '' },
-    { id: 2, name: 'Phone', price: 699, stock: 10, description: 'Daily driver', category: 'Electronics', imageUrl: '' },
-    { id: 3, name: 'Mouse', price: 29, stock: 20, description: 'Wireless', category: 'Accessories', imageUrl: '' },
-    { id: 4, name: 'Keyboard', price: 89, stock: 15, description: 'Mechanical', category: 'Accessories', imageUrl: '' },
+    {
+        id: 1,
+        name: "Apex Trail Runners",
+        description: "Breathable mesh runners built for daily miles.",
+        category: "Category1",
+        price: 89,
+        stock: 42,
+        imageUrl: "https://picsum.photos/seed/apex-trail/600/400"
+    },
+    {
+        id: 2,
+        name: "Harbor Linen Shirt",
+        description: "Soft-washed linen with a relaxed summer drape.",
+        category: "Category2",
+        price: 54,
+        stock: 60,
+        imageUrl: "https://picsum.photos/seed/harbor-linen/600/400"
+    },
+    {
+        id: 3,
+        name: "Summit Daypack",
+        description: "20L pack with padded straps and quick-access pocket.",
+        category: "Category3",
+        price: 68,
+        stock: 35,
+        imageUrl: "https://picsum.photos/seed/summit-pack/600/400"
+    },
+    {
+        id: 4,
+        name: "Aurora Desk Lamp",
+        description: "Dimmable LED lamp with warm ambient glow.",
+        category: "Category1",
+        price: 39,
+        stock: 80,
+        imageUrl: "https://picsum.photos/seed/aurora-lamp/600/400"
+    },
+    {
+        id: 5,
+        name: "Cedarwood Candle",
+        description: "Soy candle with cedar, smoke, and amber notes.",
+        category: "Category2",
+        price: 22,
+        stock: 120,
+        imageUrl: "https://picsum.photos/seed/cedar-candle/600/400"
+    },
+    {
+        id: 6,
+        name: "Pulse Smart Bottle",
+        description: "Insulated bottle with hydration reminders.",
+        category: "Category3",
+        price: 32,
+        stock: 55,
+        imageUrl: "https://picsum.photos/seed/pulse-bottle/600/400"
+    },
+    {
+        id: 7,
+        name: "Nimbus Hoodie",
+        description: "Cloud-soft fleece with a clean, modern fit.",
+        category: "Category1",
+        price: 64,
+        stock: 47,
+        imageUrl: "https://picsum.photos/seed/nimbus-hoodie/600/400"
+    },
+    {
+        id: 8,
+        name: "Arc Ceramic Mug Set",
+        description: "Set of four stackable stoneware mugs.",
+        category: "Category2",
+        price: 28,
+        stock: 75,
+        imageUrl: "https://picsum.photos/seed/arc-mugs/600/400"
+    },
+    {
+        id: 9,
+        name: "Glide Yoga Mat",
+        description: "Non-slip mat with extra cushioning.",
+        category: "Category3",
+        price: 36,
+        stock: 90,
+        imageUrl: "https://picsum.photos/seed/glide-mat/600/400"
+    },
+    {
+        id: 10,
+        name: "Northwind Parka",
+        description: "Water-resistant shell with insulated lining.",
+        category: "Category1",
+        price: 129,
+        stock: 22,
+        imageUrl: "https://picsum.photos/seed/northwind-parka/600/400"
+    },
+    {
+        id: 11,
+        name: "Quartz Wall Clock",
+        description: "Minimalist clock with silent sweep movement.",
+        category: "Category2",
+        price: 31,
+        stock: 65,
+        imageUrl: "https://picsum.photos/seed/quartz-clock/600/400"
+    },
+    {
+        id: 12,
+        name: "Drift Wireless Speaker",
+        description: "Portable speaker with 12-hour battery life.",
+        category: "Category3",
+        price: 58,
+        stock: 50,
+        imageUrl: "https://picsum.photos/seed/drift-speaker/600/400"
+    },
+    {
+        id: 13,
+        name: "Studio Notebook",
+        description: "Dotted journal with lay-flat binding.",
+        category: "Category1",
+        price: 14,
+        stock: 140,
+        imageUrl: "https://picsum.photos/seed/studio-notebook/600/400"
+    },
+    {
+        id: 14,
+        name: "Seabreeze Throw",
+        description: "Lightweight woven throw for couches or beds.",
+        category: "Category2",
+        price: 48,
+        stock: 40,
+        imageUrl: "https://picsum.photos/seed/seabreeze-throw/600/400"
+    },
+    {
+        id: 15,
+        name: "Vantage Sunglasses",
+        description: "Polarized lenses with matte acetate frame.",
+        category: "Category3",
+        price: 52,
+        stock: 70,
+        imageUrl: "https://picsum.photos/seed/vantage-sunglasses/600/400"
+    },
+    {
+        id: 16,
+        name: "Slate Cutting Board",
+        description: "Food-safe board with non-slip feet.",
+        category: "Category1",
+        price: 26,
+        stock: 85,
+        imageUrl: "https://picsum.photos/seed/slate-board/600/400"
+    },
+    {
+        id: 17,
+        name: "Bloom Planter Set",
+        description: "Set of two ceramic planters with trays.",
+        category: "Category2",
+        price: 34,
+        stock: 45,
+        imageUrl: "https://picsum.photos/seed/bloom-planters/600/400"
+    },
+    {
+        id: 18,
+        name: "Metro Travel Pouch",
+        description: "Compact organizer for cables and accessories.",
+        category: "Category3",
+        price: 19,
+        stock: 110,
+        imageUrl: "https://picsum.photos/seed/metro-pouch/600/400"
+    }
 ];
 const orders = [];
 function requireAuth(req, res, next) {

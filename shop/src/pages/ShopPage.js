@@ -6,10 +6,10 @@ import Header from '../components/Header';
 import OwnerView from '../components/OwnerView';
 const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 // const API = "http://localhost:4000"
+
 export default function ShopPage({ user, onSignOut }) {
 
-    const [products, setProducts] = useState([
-    ]);
+    const [products, setProducts] = useState([]);
 
     const [role, setRole] = useState(user?.role || 'customer'); // 'owner' | 'customer'
 
@@ -44,7 +44,10 @@ export default function ShopPage({ user, onSignOut }) {
             credentials: "include", //carry cookies
         })
             .then(r => r.json())
-            .then(d => setProducts(d.products || []));
+            .then(d => {
+                setProducts(d.products)
+
+            })
     }, []);
 
     useEffect(() => {
