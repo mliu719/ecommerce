@@ -10,8 +10,9 @@ const Cart = require("./models/Cart");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
+// const MONGO_URI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
+mongoose.connect('mongodb+srv://shutaoxiaoxyz_db_user:db_user@cluster0.jhquzy8.mongodb.net/');
 const seedProducts = [
     {
         name: "Apex Trail Runners",
@@ -532,10 +533,12 @@ app.put("/api/products/:id", requireOwner, async (req, res) => {
 });
 
 async function start() {
+    /*
     if (!MONGO_URI) {
         throw new Error("MONGODB_URI is required");
     }
     await mongoose.connect(MONGO_URI);
+    */
     const count = await Product.countDocuments();
     if (count === 0) {
         await Product.insertMany(seedProducts);
